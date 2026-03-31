@@ -7,6 +7,7 @@ set -euo pipefail
 #
 # Usage:
 #   bash .claude/bin/update.sh              # from project root
+#   bash .agents/bin/update.sh              # from project root (agents mode)
 #   bash .claude/bin/update.sh --dry-run    # preview changes only
 
 REPO_URL="${SOLANA_CLAUDE_UPSTREAM:-https://github.com/solanabr/solana-claude-config.git}"
@@ -14,17 +15,21 @@ BRANCH="${SOLANA_CLAUDE_BRANCH:-main}"
 DRY_RUN=false
 [[ "${1:-}" == "--dry-run" ]] && DRY_RUN=true
 
-TARGET_DIR="$(pwd)"
+# Auto-detect config dir from script location
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+CONFIG_NAME="$(basename "$CONFIG_DIR")"
+TARGET_DIR="$(cd "$CONFIG_DIR/.." && pwd)"
 
-# Verify we're in a project with .claude/
-if [ ! -d "$TARGET_DIR/.claude" ]; then
-  echo "Error: .claude/ not found in current directory. Run from your project root."
+# Verify we're in a project with the config dir
+if [ ! -d "$TARGET_DIR/$CONFIG_NAME" ]; then
+  echo "Error: $CONFIG_NAME/ not found in $TARGET_DIR. Run from your project root."
   exit 1
 fi
 
 # Read current version
 CURRENT_VERSION="unknown"
-[ -f "$TARGET_DIR/.claude/VERSION" ] && CURRENT_VERSION="$(cat "$TARGET_DIR/.claude/VERSION")"
+[ -f "$TARGET_DIR/$CONFIG_NAME/VERSION" ] && CURRENT_VERSION="$(cat "$TARGET_DIR/$CONFIG_NAME/VERSION")"
 
 TEMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TEMP_DIR"' EXIT
@@ -51,39 +56,31 @@ else
   echo "Updating v$CURRENT_VERSION → v$NEW_VERSION"
 fi
 echo ""
-
-# Auto-detect agents-only install (no settings.json = agents-only)
-AGENTS_ONLY=false
-[ ! -f "$TARGET_DIR/.claude/settings.json" ] && AGENTS_ONLY=true
+echo "Config directory: $CONFIG_NAME/"
 
 # Track changes
 CHANGES=""
 
 # Preserved files — never overwrite these
-# .env, .claude/settings.json, .claude/settings.local.json, .claude/mcp.json, MEMORY.md, .claude/memory/, CLAUDE.local.md
+# .env, settings.json, settings.local.json, mcp.json, MEMORY.md, memory/, CLAUDE.local.md
 
-# Directories to update
+# Directories to update (full update for both modes)
 UPDATE_DIRS="agents skills rules commands bin"
-if [ "$AGENTS_ONLY" = true ]; then
-  UPDATE_DIRS="agents skills rules"
-  echo "Detected agents-only install. Updating: $UPDATE_DIRS"
-else
-  echo "Full install detected. Updating: $UPDATE_DIRS"
-fi
+echo "Updating: $UPDATE_DIRS"
 
 for dir in $UPDATE_DIRS; do
   SRC="$TEMP_DIR/repo/.claude/$dir"
-  DST="$TARGET_DIR/.claude/$dir"
+  DST="$TARGET_DIR/$CONFIG_NAME/$dir"
   if [ -d "$SRC" ]; then
     if [ "$DRY_RUN" = true ]; then
       if ! diff -rq "$SRC" "$DST" >/dev/null 2>&1; then
-        CHANGES="$CHANGES  [would update] .claude/$dir/\n"
+        CHANGES="$CHANGES  [would update] $CONFIG_NAME/$dir/\n"
       fi
     else
       if ! diff -rq "$SRC" "$DST" >/dev/null 2>&1; then
-        CHANGES="$CHANGES  [updated] .claude/$dir/\n"
+        CHANGES="$CHANGES  [updated] $CONFIG_NAME/$dir/\n"
       fi
-      cp -r "$SRC" "$TARGET_DIR/.claude/"
+      cp -r "$SRC" "$TARGET_DIR/$CONFIG_NAME/"
     fi
   fi
 done
@@ -98,20 +95,20 @@ if [ -f "$TEMP_DIR/repo/.gitmodules" ]; then
   fi
 fi
 
-# Update VERSION inside .claude/
+# Update VERSION
 if [ -f "$TEMP_DIR/repo/.claude/VERSION" ]; then
   if [ "$DRY_RUN" = false ]; then
-    cp "$TEMP_DIR/repo/.claude/VERSION" "$TARGET_DIR/.claude/VERSION"
+    cp "$TEMP_DIR/repo/.claude/VERSION" "$TARGET_DIR/$CONFIG_NAME/VERSION"
   fi
-  CHANGES="$CHANGES  [updated] .claude/VERSION → $NEW_VERSION\n"
+  CHANGES="$CHANGES  [updated] $CONFIG_NAME/VERSION → $NEW_VERSION\n"
 fi
 
-# Update CHANGELOG.md inside .claude/
+# Update CHANGELOG.md
 if [ -f "$TEMP_DIR/repo/.claude/CHANGELOG.md" ]; then
   if [ "$DRY_RUN" = false ]; then
-    cp "$TEMP_DIR/repo/.claude/CHANGELOG.md" "$TARGET_DIR/.claude/CHANGELOG.md"
+    cp "$TEMP_DIR/repo/.claude/CHANGELOG.md" "$TARGET_DIR/$CONFIG_NAME/CHANGELOG.md"
   fi
-  CHANGES="$CHANGES  [updated] .claude/CHANGELOG.md\n"
+  CHANGES="$CHANGES  [updated] $CONFIG_NAME/CHANGELOG.md\n"
 fi
 
 # CLAUDE.md handling — don't overwrite, offer upstream version for manual merge
@@ -159,7 +156,7 @@ else
 fi
 
 echo ""
-if [ -f "$TARGET_DIR/.claude/CHANGELOG.md" ]; then
-  echo "See .claude/CHANGELOG.md for details on what changed in v$NEW_VERSION"
+if [ -f "$TARGET_DIR/$CONFIG_NAME/CHANGELOG.md" ]; then
+  echo "See $CONFIG_NAME/CHANGELOG.md for details on what changed in v$NEW_VERSION"
 fi
 echo "Update complete!"

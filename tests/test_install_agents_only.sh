@@ -18,61 +18,49 @@ echo "[test_install_agents_only] Installing --agents to temp directory: $TEMP_DI
 SOLANA_CLAUDE_LOCAL_SRC="$REPO_ROOT" bash "$REPO_ROOT/install.sh" --agents "$TEMP_DIR"
 
 echo ""
-echo "[test_install_agents_only] Verifying agents-only installation..."
+echo "[test_install_agents_only] Verifying --agents installation..."
 
-# Agents, skills, rules should exist
-assert_dir_exists "$TEMP_DIR/.claude/agents" ".claude/agents/ directory exists"
-assert_dir_exists "$TEMP_DIR/.claude/skills" ".claude/skills/ directory exists"
-assert_dir_exists "$TEMP_DIR/.claude/rules" ".claude/rules/ directory exists"
-assert_file_exists "$TEMP_DIR/.claude/skills/SKILL.md" "SKILL.md exists"
+# .agents/ directory should exist (NOT .claude/)
+assert_dir_exists "$TEMP_DIR/.agents" ".agents/ directory exists"
+
+# .claude/ should NOT exist
+TOTAL=$((TOTAL + 1))
+if [ ! -d "$TEMP_DIR/.claude" ]; then
+  echo "  PASS: .claude/ does NOT exist (--agents mode installs to .agents/)"
+  PASS=$((PASS + 1))
+else
+  echo "  FAIL: .claude/ should NOT exist in --agents mode"
+  FAIL=$((FAIL + 1))
+fi
+
+# All subdirectories should exist in .agents/
+assert_dir_exists "$TEMP_DIR/.agents/agents" ".agents/agents/ directory exists"
+assert_dir_exists "$TEMP_DIR/.agents/commands" ".agents/commands/ directory exists"
+assert_dir_exists "$TEMP_DIR/.agents/skills" ".agents/skills/ directory exists"
+assert_dir_exists "$TEMP_DIR/.agents/rules" ".agents/rules/ directory exists"
+assert_dir_exists "$TEMP_DIR/.agents/bin" ".agents/bin/ directory exists"
+assert_file_exists "$TEMP_DIR/.agents/skills/SKILL.md" "SKILL.md exists in .agents/"
+
+# settings.json should exist in .agents/
+assert_json_valid "$TEMP_DIR/.agents/settings.json" ".agents/settings.json is valid JSON"
 
 # Count agents (should match full install)
-AGENT_COUNT=$(find "$TEMP_DIR/.claude/agents" -name "*.md" | wc -l | tr -d ' ')
+AGENT_COUNT=$(find "$TEMP_DIR/.agents/agents" -name "*.md" | wc -l | tr -d ' ')
 assert_eq "15" "$AGENT_COUNT" "Agent count is 15"
 
-# Commands should NOT exist (agents-only mode)
-TOTAL=$((TOTAL + 1))
-if [ ! -d "$TEMP_DIR/.claude/commands" ]; then
-  echo "  PASS: .claude/commands/ does NOT exist (agents-only mode)"
-  PASS=$((PASS + 1))
-else
-  echo "  FAIL: .claude/commands/ should NOT exist in agents-only mode"
-  FAIL=$((FAIL + 1))
-fi
+# Count commands (should match full install)
+CMD_COUNT=$(find "$TEMP_DIR/.agents/commands" -name "*.md" | wc -l | tr -d ' ')
+assert_eq "24" "$CMD_COUNT" "Command count is 24"
 
-# settings.json should NOT exist
-TOTAL=$((TOTAL + 1))
-if [ ! -f "$TEMP_DIR/.claude/settings.json" ]; then
-  echo "  PASS: settings.json does NOT exist (agents-only mode)"
-  PASS=$((PASS + 1))
-else
-  echo "  FAIL: settings.json should NOT exist in agents-only mode"
-  FAIL=$((FAIL + 1))
-fi
+# CLAUDE.md should exist at project root
+assert_file_exists "$TEMP_DIR/CLAUDE.md" "CLAUDE.md exists at project root"
 
-# CLAUDE.md should NOT exist
-TOTAL=$((TOTAL + 1))
-if [ ! -f "$TEMP_DIR/CLAUDE.md" ]; then
-  echo "  PASS: CLAUDE.md does NOT exist (agents-only mode)"
-  PASS=$((PASS + 1))
-else
-  echo "  FAIL: CLAUDE.md should NOT exist in agents-only mode"
-  FAIL=$((FAIL + 1))
-fi
+# CLAUDE.local.md should exist
+assert_file_exists "$TEMP_DIR/CLAUDE.local.md" "CLAUDE.local.md exists"
 
-# CLAUDE.local.md should NOT exist
-TOTAL=$((TOTAL + 1))
-if [ ! -f "$TEMP_DIR/CLAUDE.local.md" ]; then
-  echo "  PASS: CLAUDE.local.md does NOT exist (agents-only mode)"
-  PASS=$((PASS + 1))
-else
-  echo "  FAIL: CLAUDE.local.md should NOT exist in agents-only mode"
-  FAIL=$((FAIL + 1))
-fi
-
-# .gitignore should have ext/ entry
+# .gitignore should have .agents/skills/ext/ entry
 assert_file_exists "$TEMP_DIR/.gitignore" ".gitignore exists"
 GITIGNORE_CONTENT="$(cat "$TEMP_DIR/.gitignore")"
-assert_contains "$GITIGNORE_CONTENT" ".claude/skills/ext/" ".gitignore contains ext/ entry"
+assert_contains "$GITIGNORE_CONTENT" ".agents/skills/ext/" ".gitignore contains .agents/skills/ext/ entry"
 
 print_summary

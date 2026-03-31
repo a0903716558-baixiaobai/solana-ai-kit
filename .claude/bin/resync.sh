@@ -6,11 +6,16 @@ set -euo pipefail
 #
 # Usage:
 #   bash .claude/bin/resync.sh
+#   bash .agents/bin/resync.sh
 
-TARGET_DIR="$(pwd)"
+# Auto-detect config dir from script location
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+CONFIG_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
+CONFIG_NAME="$(basename "$CONFIG_DIR")"
+TARGET_DIR="$(cd "$CONFIG_DIR/.." && pwd)"
 
-if [ ! -d "$TARGET_DIR/.claude/skills/ext" ]; then
-  echo "Error: .claude/skills/ext/ not found. Run from your project root."
+if [ ! -d "$TARGET_DIR/$CONFIG_NAME/skills/ext" ]; then
+  echo "Error: $CONFIG_NAME/skills/ext/ not found. Run from your project root."
   exit 1
 fi
 
@@ -31,8 +36,8 @@ git submodule status
 echo ""
 
 # Verify skill paths
-SKILL_HUB=".claude/skills/SKILL.md"
-SKILL_DIR=".claude/skills"
+SKILL_HUB="$CONFIG_NAME/skills/SKILL.md"
+SKILL_DIR="$CONFIG_NAME/skills"
 MISSING=0
 
 if [ -f "$SKILL_HUB" ]; then
@@ -52,7 +57,7 @@ if [ -f "$SKILL_HUB" ]; then
       echo "  MISSING DIR: $ref -> $FULL_PATH"
       MISSING=$((MISSING + 1))
     fi
-  done < <(grep -oE '\]\([^)]+/\)' "$SKILL_HUB" | sed 's/\](//' | sed 's/)//' | grep -v '^http')
+  done < <(grep -oE '\]\([^)]+/\)' "$SKILL_HUB" | sed 's/\]//' | sed 's/)//' | grep -v '^http')
 
   if [ "$MISSING" -eq 0 ]; then
     echo "  All skill paths resolve correctly."
@@ -70,4 +75,4 @@ git submodule foreach --quiet '
   echo "  $name: $LATEST"
 '
 echo ""
-echo "Run 'git add .gitmodules .claude/skills/ext/' and commit to lock updates."
+echo "Run 'git add .gitmodules $CONFIG_NAME/skills/ext/' and commit to lock updates."

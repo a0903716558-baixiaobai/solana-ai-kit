@@ -41,24 +41,22 @@ cd /path/to/your-project && git submodule update --init --recursive
 claude
 ```
 
-### `--agents` Flag (Non-Claude Users)
+### `--agents` Flag
 
-If you use Cursor, Windsurf, Copilot, or another AI tool, pass `--agents` to install only the knowledge files:
+Pass `--agents` to install everything into `.agents/` instead of `.claude/`. Same content, different directory name. Useful when `.claude/` is already taken or for non-Claude AI tools (Cursor, Windsurf, Copilot, etc.).
 
 ```bash
 bash install.sh --agents /path/to/your-project
 ```
 
-This installs `.claude/agents/`, `.claude/skills/`, and `.claude/rules/` — the markdown files that work as system prompts or context for any AI tool. It skips Claude Code-specific files (commands, mcp.json, settings.json, CLAUDE.md).
-
-To update an agents-only install:
+To update an `--agents` install:
 
 ```bash
-# Use /update command in Claude Code, or run directly:
-bash .claude/bin/update.sh
+# Run from your project root:
+bash .agents/bin/update.sh
 ```
 
-### MCP Setup (Optional, Claude Code only)
+### MCP Setup (Optional)
 
 After installation, configure MCP servers for enhanced capabilities:
 
