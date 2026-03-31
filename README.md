@@ -107,6 +107,20 @@ Recommended team patterns:
 | **defi-compose** | researcher → defi-engineer → qa | DeFi integration |
 | **token-launch** | token-engineer → frontend → qa | Token creation + launch UI |
 
+## External Skill Submodules
+
+| Submodule | Source | Purpose |
+|-----------|--------|---------|
+| `ext/solana-dev` | [solana-foundation/solana-dev-skill](https://github.com/solana-foundation/solana-dev-skill) | Core Solana development (programs, frontend, testing, security) |
+| `ext/sendai` | [sendaifun/skills](https://github.com/sendaifun/skills) | DeFi protocol integrations (Jupiter, Drift, Raydium, etc.) |
+| `ext/solana-game` | [solanabr/solana-game-skill](https://github.com/solanabr/solana-game-skill) | Game development (Unity, PlaySolana, PSG1) |
+| `ext/cloudflare` | [cloudflare/skills](https://github.com/cloudflare/skills) | Infrastructure (Workers, Agents SDK, MCP servers) |
+| `ext/trailofbits` | [trailofbits/skills](https://github.com/trailofbits/skills) | Security auditing and vulnerability scanning |
+| `ext/qedgen` | [QEDGen/solana-skills](https://github.com/QEDGen/solana-skills) | Formal verification with Lean 4 theorem proving |
+| `ext/solana-mobile` | [nicoorfi/solana-mobile](https://github.com/nicoorfi/solana-mobile) | Mobile Wallet Adapter, Genesis Token, SKR address resolution |
+| `ext/colosseum` | [ColosseumOrg/colosseum-copilot](https://github.com/ColosseumOrg/colosseum-copilot) | Startup research, idea validation, hackathon projects (proprietary license) |
+| `ext/safe-solana-builder` | [frankcastleauditor/safe-solana-builder](https://github.com/frankcastleauditor/safe-solana-builder) | Security-first code generation (70+ audit-derived rules) |
+
 ### MCP Server Integrations
 
 Pre-configured MCP servers in `.claude/mcp.json` (API keys go in `.env`):
@@ -268,20 +282,6 @@ This config includes a pre-built GitHub Action (`.github/workflows/claude-code.y
 3. Team members can `@claude` in PR comments
 4. Claude responds with code suggestions using this configuration
 
-## External Skill Submodules
-
-| Submodule | Source | Purpose |
-|-----------|--------|---------|
-| `ext/solana-dev` | [solana-foundation/solana-dev-skill](https://github.com/solana-foundation/solana-dev-skill) | Core Solana development (programs, frontend, testing, security) |
-| `ext/sendai` | [sendaifun/skills](https://github.com/sendaifun/skills) | DeFi protocol integrations (Jupiter, Drift, Raydium, etc.) |
-| `ext/solana-game` | [solanabr/solana-game-skill](https://github.com/solanabr/solana-game-skill) | Game development (Unity, PlaySolana, PSG1) |
-| `ext/cloudflare` | [cloudflare/skills](https://github.com/cloudflare/skills) | Infrastructure (Workers, Agents SDK, MCP servers) |
-| `ext/trailofbits` | [trailofbits/skills](https://github.com/trailofbits/skills) | Security auditing and vulnerability scanning |
-| `ext/qedgen` | [QEDGen/solana-skills](https://github.com/QEDGen/solana-skills) | Formal verification with Lean 4 theorem proving |
-| `ext/solana-mobile` | [nicoorfi/solana-mobile](https://github.com/nicoorfi/solana-mobile) | Mobile Wallet Adapter, Genesis Token, SKR address resolution |
-| `ext/colosseum` | [ColosseumOrg/colosseum-copilot](https://github.com/ColosseumOrg/colosseum-copilot) | Startup research, idea validation, hackathon projects (proprietary license) |
-| `ext/safe-solana-builder` | [frankcastleauditor/safe-solana-builder](https://github.com/frankcastleauditor/safe-solana-builder) | Security-first code generation (70+ audit-derived rules) |
-
 ## Branch Workflow
 
 All new work starts on a feature branch:
@@ -350,8 +350,6 @@ This project builds on excellent work from the community:
 - **[ColosseumOrg/colosseum-copilot](https://github.com/ColosseumOrg/colosseum-copilot)** - Solana startup research, idea validation, and hackathon project discovery from Colosseum. Proprietary license (Copyright Colosseum).
 
 - **[0xquinto/bcherny-claude](https://github.com/0xquinto/bcherny-claude)** - Compiled Boris Cherny's (creator of Claude Code at Anthropic) best practices including verification loops, parallel Claude sessions, and CLAUDE.md patterns.
-
-- **[builderz-labs/solana-claude-md](https://github.com/builderz-labs/solana-claude-md)** - Provided starter inspiration for Solana-specific Claude configuration.
 
 ## License
 
