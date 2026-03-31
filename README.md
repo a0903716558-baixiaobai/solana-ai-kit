@@ -16,7 +16,7 @@ If you installed manually, remember to rename ./CLAUDE-solana.md back to ./CLAUD
 A complete `.claude/` configuration that turns Claude into a Solana development expert with:
 
 - **15 specialized agents** for different tasks (architecture, Anchor, Pinocchio, DeFi, tokens, frontend, mobile, backend, DevOps, QA, docs, games, Unity, learning, research)
-- **22 workflow commands** for building, testing, deploying, profiling, migrating, and committing
+- **24 workflow commands** for building, testing, deploying, profiling, migrating, and committing
 - **6 MCP server integrations** for on-chain data (Helius), Solana docs (solana-dev), library docs (Context7), browser automation (Puppeteer), context optimization (context-mode), and persistent memory (memsearch)
 - **Agent teams** for multi-step workflows (architect → engineer → QA)
 - **Progressive skill loading** that only loads context when needed (saves tokens)
@@ -54,8 +54,8 @@ This installs `.claude/agents/`, `.claude/skills/`, and `.claude/rules/` — the
 To update an agents-only install:
 
 ```bash
-bash update.sh --agents /path/to/your-project
-# or just: bash update.sh /path/to/your-project  (auto-detects agents-only)
+# Use /update command in Claude Code, or run directly:
+bash .claude/bin/update.sh
 ```
 
 ### MCP Setup (Optional, Claude Code only)
@@ -118,9 +118,12 @@ Pre-configured MCP servers in `.claude/mcp.json` (API keys go in `.env`):
 
 ### Token-Efficient Design
 
+- CLAUDE.md is delivered as a user message (not system prompt) — shorter = better adherence
 - Skills load progressively (not all at once)
 - Agents reference skills instead of duplicating content
-- Rules auto-load only for matching file patterns
+- Path-scoped rules lazy-load on file read (zero startup cost)
+- `CLAUDE.local.md` for private scratch notes (gitignored, never shared)
+- Subdirectory CLAUDE.md files lazy-load in monorepos
 - Decision frameworks live in agents, not global context
 
 ### Modern Stack (2026)
@@ -143,9 +146,10 @@ Pre-configured MCP servers in `.claude/mcp.json` (API keys go in `.env`):
 ```
 .
 ├── CLAUDE.md                    # Main hub - Claude reads this first
+├── CLAUDE.local.md              # Private notes (gitignored)
 ├── README.md                    # This file
 ├── install.sh                   # One-liner installer
-├── update.sh                    # Config updater
+├── update.sh                    # Deprecation wrapper → .claude/bin/update.sh
 ├── validate.sh                  # Config integrity checker
 ├── LICENSE                      # MIT
 ├── tests/                       # Config integrity test suite
@@ -153,8 +157,13 @@ Pre-configured MCP servers in `.claude/mcp.json` (API keys go in `.env`):
 │   ├── ci.yml                       # PR validation
 │   └── claude-code.yml              # Claude Code action template
 └── .claude/
+    ├── VERSION                  # Semver version (e.g. 1.1.0)
+    ├── CHANGELOG.md             # Release notes
     ├── agents/                  # 15 specialized agents
-    ├── commands/                # 22 workflow commands
+    ├── bin/
+    │   ├── update.sh                # In-place update from upstream
+    │   └── resync.sh                # Submodule resync script
+    ├── commands/                # 24 workflow commands
     ├── skills/                  # Progressive-loading knowledge
     │   ├── SKILL.md                 # Unified hub routing to all skills
     │   ├── ext/                     # External skill submodules
@@ -165,7 +174,8 @@ Pre-configured MCP servers in `.claude/mcp.json` (API keys go in `.env`):
     │   │   ├── trailofbits/             # Trail of Bits security skills
     │   │   ├── qedgen/                # QEDGen formal verification (Lean 4)
     │   │   ├── solana-mobile/           # Mobile Wallet Adapter, Genesis Token
-    │   │   └── colosseum/              # Colosseum Copilot (startup research)
+    │   │   ├── colosseum/              # Colosseum Copilot (startup research)
+    │   │   └── safe-solana-builder/   # Security-first code generation
     │   ├── token-2022.md            # Token Extensions guide (local)
     │   ├── backend-async.md         # Axum/Tokio patterns (local)
     │   └── deployment.md            # Deployment workflows (local)
@@ -229,18 +239,20 @@ Pre-configured MCP servers in `.claude/mcp.json` (API keys go in `.env`):
 | `/quick-commit` | Create branch, format, lint, conventional commit |
 | `/setup-ci-cd` | Configure GitHub Actions pipeline |
 | `/setup-mcp` | Configure MCP server API keys and connections |
-| `/update-skills` | Update external skill submodules |
+| `/resync` | Resync external skill submodules to latest |
 | `/write-docs` | Generate documentation for programs, APIs, components |
 | `/explain-code` | Explain complex code with visual diagrams |
 | `/plan-feature` | Plan feature implementation with specifications |
+| `/update` | Update config to latest version from upstream |
+| `/cleanup` | Initialize forked template — setup CLAUDE.md, remove scaffolding |
 
 ## DX Scripts
 
 | Script | Purpose |
 |--------|---------|
 | `install.sh` | One-liner installer: copies config to your project (`--agents` for non-Claude tools) |
-| `update.sh` | Updates config in existing project to latest version (`--agents` or auto-detects) |
-| `validate.sh` | Validates all config integrity (agents, commands, skills, settings) |
+| `update.sh` | Deprecation wrapper → `.claude/bin/update.sh` |
+| `validate.sh` | Validates all config integrity (agents, commands, skills, settings, versioning) |
 | `tests/run_all.sh` | Runs full test suite for config validation |
 
 ## GitHub Action for Team Collaboration
@@ -264,6 +276,7 @@ This config includes a pre-built GitHub Action (`.github/workflows/claude-code.y
 | `ext/qedgen` | [QEDGen/solana-skills](https://github.com/QEDGen/solana-skills) | Formal verification with Lean 4 theorem proving |
 | `ext/solana-mobile` | [nicoorfi/solana-mobile](https://github.com/nicoorfi/solana-mobile) | Mobile Wallet Adapter, Genesis Token, SKR address resolution |
 | `ext/colosseum` | [ColosseumOrg/colosseum-copilot](https://github.com/ColosseumOrg/colosseum-copilot) | Startup research, idea validation, hackathon projects (proprietary license) |
+| `ext/safe-solana-builder` | [frankcastleauditor/safe-solana-builder](https://github.com/frankcastleauditor/safe-solana-builder) | Security-first code generation (70+ audit-derived rules) |
 
 ## Branch Workflow
 
@@ -289,14 +302,26 @@ Remove: excessive comments, abnormal try/catch blocks, verbose errors, redundant
 
 Keep: legitimate security checks, non-obvious explanations, matching error patterns.
 
+## Using as a GitHub Template
+
+1. Click "Use this template" on GitHub (or fork the repo)
+2. Clone your new repo
+3. Run Claude Code and use `/cleanup` — this copies `CLAUDE-solana.md` → `CLAUDE.md` and removes config repo scaffolding (tests, install scripts, docs)
+4. Start building!
+
+For monorepos, add a `CLAUDE.md` to each package/module with architecture decisions scoped to that directory. Claude Code automatically loads these when working in that subdirectory.
+
 ## Updating
 
 ```bash
-# Update full config
-bash update.sh /path/to/your-project
+# Preferred: use /update in Claude Code, or run directly:
+bash .claude/bin/update.sh
 
-# Update agents-only install
-bash update.sh --agents /path/to/your-project
+# Preview changes without applying:
+bash .claude/bin/update.sh --dry-run
+
+# Resync skill submodules only:
+bash .claude/bin/resync.sh
 
 # Or manually update submodules
 git submodule update --remote --merge

@@ -54,7 +54,7 @@ After setup, run `/setup-mcp` in Claude Code to configure:
 | **solana-guide** | Learning and tutorials |
 | **solana-researcher** | Ecosystem research |
 
-### 22 Slash Commands
+### 24 Slash Commands
 
 **Building:**
 - `/build-program` - Build Anchor or native programs
@@ -64,7 +64,7 @@ After setup, run `/setup-mcp` in Claude Code to configure:
 
 **Testing & Quality:**
 - `/test-rust` - Run Rust tests
-- `/test-typescript` - Run TypeScript tests
+- `/test-ts` - Run TypeScript tests
 - `/test-dotnet` - Run .NET/Unity tests
 - `/test-and-fix` - Run tests and auto-fix issues
 - `/audit-solana` - Security audit
@@ -81,10 +81,12 @@ After setup, run `/setup-mcp` in Claude Code to configure:
 - `/quick-commit` - Format, lint, and commit
 - `/setup-ci-cd` - Setup CI/CD pipeline
 - `/setup-mcp` - Configure MCP servers
-- `/update-skills` - Update external skill submodules
+- `/resync` - Resync external skill submodules
 - `/write-docs` - Generate documentation
 - `/explain-code` - Explain complex code
 - `/plan-feature` - Plan feature implementation
+- `/update` - Update config to latest upstream
+- `/cleanup` - Initialize forked template, remove scaffolding
 
 ### Agent Teams
 
@@ -146,7 +148,7 @@ your-project/
 ├── CLAUDE.md              # ← Main config (copied from CLAUDE-solana.md)
 ├── .claude/
 │   ├── agents/            # 15 specialized AI agents
-│   ├── commands/          # 22 slash commands
+│   ├── commands/          # 24 slash commands
 │   ├── skills/            # Progressive knowledge
 │   │   ├── SKILL.md           # Unified hub (start here)
 │   │   ├── ext/               # External skill submodules
@@ -157,7 +159,8 @@ your-project/
 │   │   │   ├── trailofbits/       # Security auditing
 │   │   │   ├── qedgen/            # Formal verification (Lean 4)
 │   │   │   ├── solana-mobile/     # Mobile Wallet Adapter
-│   │   │   └── colosseum/         # Startup research (Colosseum)
+│   │   │   ├── colosseum/         # Startup research (Colosseum)
+│   │   │   └── safe-solana-builder/ # Security-first code gen
 │   │   ├── token-2022.md     # Token Extensions guide
 │   │   ├── backend-async.md  # Axum/Tokio patterns
 │   │   └── deployment.md     # Deploy workflows
@@ -241,11 +244,11 @@ Edit `.env` to add API keys for MCP servers (Helius, Solana Agent Kit). Run `/se
 ## Updating
 
 ```bash
-# Update config to latest version
-bash update.sh /path/to/your-project
+# Preferred: use /update in Claude Code, or run directly:
+bash .claude/bin/update.sh
 
-# Or update submodules only
-/update-skills
+# Or resync submodules only
+/resync
 ```
 
 ---
@@ -271,7 +274,7 @@ bash update.sh /path/to/your-project
 
 **Submodules empty:**
 - Run `git submodule update --init --recursive`
-- Or run `/update-skills`
+- Or run `/resync`
 
 ---
 

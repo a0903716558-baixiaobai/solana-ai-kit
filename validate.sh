@@ -97,6 +97,31 @@ for dir in .claude/skills/ext/*/; do
 done
 echo ""
 
+# --- Versioning ---
+echo "[Versioning]"
+if [ -f .claude/VERSION ]; then
+  if grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$' .claude/VERSION; then
+    check ".claude/VERSION follows semver" 0
+  else
+    check ".claude/VERSION follows semver" 1
+  fi
+else
+  check ".claude/VERSION file exists" 1
+fi
+
+if [ -f .claude/bin/update.sh ] && [ -x .claude/bin/update.sh ]; then
+  check "update.sh exists and is executable" 0
+else
+  check "update.sh exists and is executable" 1
+fi
+
+if [ -f .claude/bin/resync.sh ] && [ -x .claude/bin/resync.sh ]; then
+  check "resync.sh exists and is executable" 0
+else
+  check "resync.sh exists and is executable" 1
+fi
+echo ""
+
 # --- .env.example ---
 echo "[Environment]"
 if [ -f .env.example ]; then

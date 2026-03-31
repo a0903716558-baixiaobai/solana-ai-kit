@@ -9,6 +9,7 @@ set -euo pipefail
 
 REPO_URL="https://github.com/solanabr/solana-claude-config.git"
 BRANCH="main"
+SCRIPT_VERSION="dev"
 
 # Parse flags
 AGENTS_ONLY=false
@@ -27,12 +28,6 @@ TARGET_DIR="$(cd "$TARGET_DIR" && pwd)"
 TEMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TEMP_DIR"' EXIT
 
-if [ "$AGENTS_ONLY" = true ]; then
-  echo "Installing Solana agents + skills to: $TARGET_DIR"
-else
-  echo "Installing Solana Claude Config to: $TARGET_DIR"
-fi
-
 # Support local source for testing: SOLANA_CLAUDE_LOCAL_SRC=/path/to/repo
 if [ -n "${SOLANA_CLAUDE_LOCAL_SRC:-}" ] && [ -d "$SOLANA_CLAUDE_LOCAL_SRC/.claude" ]; then
   echo "Using local source: $SOLANA_CLAUDE_LOCAL_SRC"
@@ -41,10 +36,21 @@ if [ -n "${SOLANA_CLAUDE_LOCAL_SRC:-}" ] && [ -d "$SOLANA_CLAUDE_LOCAL_SRC/.clau
   cp "$SOLANA_CLAUDE_LOCAL_SRC/CLAUDE-solana.md" "$TEMP_DIR/repo/CLAUDE-solana.md"
   [ -f "$SOLANA_CLAUDE_LOCAL_SRC/.env.example" ] && cp "$SOLANA_CLAUDE_LOCAL_SRC/.env.example" "$TEMP_DIR/repo/.env.example"
   [ -f "$SOLANA_CLAUDE_LOCAL_SRC/.gitmodules" ] && cp "$SOLANA_CLAUDE_LOCAL_SRC/.gitmodules" "$TEMP_DIR/repo/.gitmodules"
+  [ -f "$SOLANA_CLAUDE_LOCAL_SRC/.claude/VERSION" ] && cp "$SOLANA_CLAUDE_LOCAL_SRC/.claude/VERSION" "$TEMP_DIR/repo/.claude/VERSION"
+  [ -f "$SOLANA_CLAUDE_LOCAL_SRC/.claude/CHANGELOG.md" ] && cp "$SOLANA_CLAUDE_LOCAL_SRC/.claude/CHANGELOG.md" "$TEMP_DIR/repo/.claude/CHANGELOG.md"
 else
   # Clone repo with submodules
   echo "Cloning repository..."
   git clone --recurse-submodules --depth 1 --branch "$BRANCH" "$REPO_URL" "$TEMP_DIR/repo" 2>&1 | tail -1 || true
+fi
+
+# Read version from source
+[ -f "$TEMP_DIR/repo/.claude/VERSION" ] && SCRIPT_VERSION="$(cat "$TEMP_DIR/repo/.claude/VERSION")"
+
+if [ "$AGENTS_ONLY" = true ]; then
+  echo "Installing Solana agents + skills v$SCRIPT_VERSION to: $TARGET_DIR"
+else
+  echo "Installing Solana Claude Config v$SCRIPT_VERSION to: $TARGET_DIR"
 fi
 
 if [ "$AGENTS_ONLY" = true ]; then
@@ -131,6 +137,18 @@ else
     echo "# External Claude skill submodules" > "$GITIGNORE"
     echo "$EXT_PATTERN" >> "$GITIGNORE"
     echo "Created .gitignore with $EXT_PATTERN"
+  fi
+
+  # Create CLAUDE.local.md (private notes, gitignored)
+  if [ ! -f "$TARGET_DIR/CLAUDE.local.md" ]; then
+    echo "# Local Notes (gitignored)" > "$TARGET_DIR/CLAUDE.local.md"
+    echo "" >> "$TARGET_DIR/CLAUDE.local.md"
+    echo "<!-- Claude writes here freely. Private to this machine. -->" >> "$TARGET_DIR/CLAUDE.local.md"
+  fi
+
+  # Add CLAUDE.local.md to .gitignore
+  if ! grep -qF "CLAUDE.local.md" "$GITIGNORE"; then
+    echo "CLAUDE.local.md" >> "$GITIGNORE"
   fi
 
   # Copy .env.example and create .env if missing

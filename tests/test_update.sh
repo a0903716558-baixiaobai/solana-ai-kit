@@ -18,7 +18,8 @@ echo "[test_update] Installing to temp directory first..."
 SOLANA_CLAUDE_LOCAL_SRC="$REPO_ROOT" bash "$REPO_ROOT/install.sh" "$TEMP_DIR" >/dev/null 2>&1
 
 echo "[test_update] Running update..."
-SOLANA_CLAUDE_LOCAL_SRC="$REPO_ROOT" bash "$REPO_ROOT/update.sh" "$TEMP_DIR"
+# Run update from within the temp dir (update.sh operates on pwd)
+(cd "$TEMP_DIR" && SOLANA_CLAUDE_LOCAL_SRC="$REPO_ROOT" bash .claude/bin/update.sh)
 
 echo ""
 echo "[test_update] Verifying update..."
@@ -29,5 +30,7 @@ assert_dir_exists "$TEMP_DIR/.claude/agents" "agents/ preserved"
 assert_dir_exists "$TEMP_DIR/.claude/commands" "commands/ preserved"
 assert_file_exists "$TEMP_DIR/.claude/skills/SKILL.md" "SKILL.md preserved"
 assert_json_valid "$TEMP_DIR/.claude/settings.json" "settings.json still valid"
+assert_file_exists "$TEMP_DIR/CLAUDE.local.md" "CLAUDE.local.md created by update"
+assert_file_exists "$TEMP_DIR/.claude/VERSION" ".claude/VERSION exists after update"
 
 print_summary

@@ -1,4 +1,6 @@
 # Solana Claude Config - Meta Configuration
+<!-- This is the config-repo maintainer file (NOT shipped to user projects).
+     CLAUDE-solana.md is the one that ships as CLAUDE.md to target projects. -->
 
 This repository contains Claude Code configuration for Solana development projects. The actual Solana builder configuration lives in `CLAUDE-solana.md` and should be copied to target projects as their `CLAUDE.md`.
 
@@ -11,16 +13,22 @@ This repository contains Claude Code configuration for Solana development projec
 You are maintaining the **solana-claude-config** repository - a template/library of Claude Code configurations for Solana development. Your role is to improve, test, and maintain the agents, skills, commands, MCP servers, and rules that other projects will use.
 
 ## Token Loading Model
+<!-- WHY: Understanding when each file loads determines your token budget.
+     CLAUDE.md is a user message (not system prompt) — shorter = better adherence.
+     Rules without paths: load at session start, so keep them minimal. -->
 
-| File | When loaded | Audience | Budget guidance |
-|------|-------------|----------|-----------------|
-| `CLAUDE.md` | Every conversation (this repo) | Claude maintaining config | Keep lean (<100 lines) |
-| `CLAUDE-solana.md` | Every conversation (user projects) | Claude in target projects | Keep <100 lines; HTML comments stripped (free) |
-| `.claude/rules/*.md` | Auto-loaded by glob match | Claude editing matched files | Minimal — loads on every matching file edit |
-| `.claude/agents/*.md` | On agent spawn only | Spawned agent | Can be detailed — only loads when needed |
-| `.claude/commands/*.md` | On command invocation | Claude running command | Can be detailed — only loads when invoked |
-| `.claude/skills/SKILL.md` | On skill invocation | Claude routing to skills | Medium — routing hub, not a dump; HTML comments NOT stripped |
-| `.claude/skills/*.md` | On-demand via SKILL.md links | Claude needing domain knowledge | Can be detailed — progressive loading |
+| File | When loaded | Budget guidance |
+|------|-------------|-----------------|
+| `CLAUDE.md` | Session start; delivered as user message (uncached) | Keep <200 lines; costs every turn |
+| `CLAUDE-solana.md` | Session start (user projects) | Keep <120 lines; uncached; HTML comments stripped (free) |
+| `MEMORY.md` | Session start | 200-line / 25KB cap; index pointers only |
+| `.claude/rules/*.md` (with `paths:`) | Lazy — on matching file read | Can be detailed; zero startup cost |
+| `.claude/rules/*.md` (no `paths:`) | Session start | Minimal — always loaded |
+| `.claude/agents/*.md` | On agent spawn | Can be detailed |
+| `.claude/commands/*.md` | On invocation | Can be detailed |
+| `.claude/skills/SKILL.md` | On invocation | Medium; HTML comments NOT stripped |
+| `.claude/skills/*.md` | On-demand via links | Can be detailed |
+| Subdirectory `CLAUDE.md` | Lazy — when Claude reads files in that dir | Monorepo module configs |
 
 ## Communication Style
 
@@ -42,9 +50,11 @@ You are maintaining the **solana-claude-config** repository - a template/library
 - Run `bash validate.sh && bash tests/run_all.sh` before every commit
 - Check QUICK-START.md and README.md after any structural change
 - Test install.sh in a temp dir after modifying it
-- Keep CLAUDE-solana.md under 100 lines — it loads on every user conversation
+- Keep CLAUDE-solana.md under 120 lines — it loads on every user conversation
 
 ## Ripple Map
+<!-- CRITICAL: This is the #1 cause of stale docs. When adding/removing
+     any component, walk through every row before committing. -->
 
 When X changes, also update Y:
 
@@ -93,6 +103,13 @@ All changes on feature branches: `git checkout -b <type>/<scope>-<description>-<
 - **Local install test**: `SOLANA_CLAUDE_LOCAL_SRC=. bash install.sh /tmp/test-project` — uses local repo instead of cloning from GitHub.
 - **Agents-only mode**: `bash install.sh --agents /path` — installs to `.agents/` instead of `.claude/`. Test both modes when modifying install.sh.
 
+## Release Management
+<!-- Workflow: bump .claude/VERSION → update .claude/CHANGELOG.md → validate → tag -->
+
+- `.claude/VERSION` contains current semver (e.g. `1.1.0`). Bump **patch** for bug fixes, **minor** for new agents/skills/commands, **major** for breaking install.sh changes.
+- When bumping VERSION, also prepend a new entry to `.claude/CHANGELOG.md` with date and categorized changes (Added/Changed/Fixed/Removed).
+- After bumping, run `bash validate.sh && bash tests/run_all.sh` and tag: `git tag v$(cat .claude/VERSION)`.
+
 ## Project Learnings
 <!-- Append 1-2 line entries after non-obvious bugs, stale-doc incidents,
      or config changes that had unexpected side effects.
@@ -106,6 +123,9 @@ All changes on feature branches: `git checkout -b <type>/<scope>-<description>-<
 - When adding a component: follow Ripple Map above, then `bash validate.sh && bash tests/run_all.sh` to catch anything missed
 
 ### Config Conventions
+
+- `.claude/VERSION` follows semver; bump on every release. `.claude/CHANGELOG.md` tracks what changed.
+- `/dream` triggers memory consolidation (merges, prunes, deduplicates MEMORY.md). Run after major refactors.
 
 ---
 

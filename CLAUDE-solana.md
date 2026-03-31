@@ -1,7 +1,7 @@
 # Solana Development Configuration
 
 <!-- MAINTAINER: This file ships as CLAUDE.md to target projects via install.sh.
-     Official target: <200 lines. Current: ~80 lines.
+     Official target: <150 lines. Current: ~110 lines.
      Language-specific rules live in .claude/rules/ — don't duplicate here.
      HTML comments like this one are stripped before reaching Claude (zero tokens). -->
 
@@ -83,16 +83,28 @@ If program change:
 - [ ] CU profiled (`/profile-cu`)
 - [ ] Verifiable build (`anchor build --verifiable`) if deploying
 
-## Project Learnings
-<!-- Claude appends 1-2 line entries here after /diff-review findings,
-     non-obvious bug fixes, or unexpected deploy/test failures.
-     Don't duplicate existing entries. Check before appending. -->
+## Self-Learning
+<!-- Two tiers: strict (tracked) and relaxed (private). -->
 
-### Recurring Issues
+**Writing to `CLAUDE.md`** (this file, tracked in git):
+- Only when user is emphatic about a preference or correction
+- When a process or error repeated 2+ times reveals a pattern
+- When user explicitly says "remember this" or similar
+- Project-specific → write here. Cross-project → write to `~/.claude/CLAUDE.md`.
 
-### Fix Patterns
+**Writing to `CLAUDE.local.md`** (private, gitignored):
+- Observations, scratch context, debugging notes, session summaries
+- Be concise — only what's clearly useful. Not shared with team.
 
 ### Project Conventions
+
+### Recurring Patterns
+
+## Monorepo Support
+<!-- Claude Code auto-walks up dir tree loading ancestor CLAUDE.md files,
+     and lazy-loads subdirectory CLAUDE.md when you work in those dirs. -->
+
+In monorepos, add `CLAUDE.md` per package/module for scoped architecture decisions. These load automatically when Claude works in that directory. Use `claudeMdExcludes` in `.claude/settings.local.json` to skip irrelevant ancestor configs.
 
 ---
 
