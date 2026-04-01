@@ -25,13 +25,13 @@ assert_file_contains "$REPO_ROOT/QUICK-START.md" "24 Slash Commands" "QUICK-STAR
 
 # --- MCP server count cross-references ---
 echo "[mcp]"
-MCP_COUNT=$(python3 -c "import json; print(len(json.load(open('$REPO_ROOT/.claude/mcp.json'))['mcpServers']))" 2>/dev/null)
+MCP_COUNT=$(python3 -c "import json; print(len(json.load(open('$REPO_ROOT/.mcp.json'))['mcpServers']))" 2>/dev/null)
 assert_eq "6" "$MCP_COUNT" "MCP server count in mcp.json is 6"
 assert_file_contains "$REPO_ROOT/README.md" "6 MCP server" "README.md references 6 MCP servers"
 
 # --- MCP servers appear in CLAUDE-solana.md ---
 echo "[mcp-in-claude-solana]"
-MCP_KEYS=$(python3 -c "import json; [print(k) for k in json.load(open('$REPO_ROOT/.claude/mcp.json'))['mcpServers'].keys()]" 2>/dev/null)
+MCP_KEYS=$(python3 -c "import json; [print(k) for k in json.load(open('$REPO_ROOT/.mcp.json'))['mcpServers'].keys()]" 2>/dev/null)
 while IFS= read -r key; do
   [ -z "$key" ] && continue
   # Map mcp.json keys to names used in CLAUDE-solana.md

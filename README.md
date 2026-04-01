@@ -123,7 +123,7 @@ Recommended team patterns:
 
 ### MCP Server Integrations
 
-Pre-configured MCP servers in `.claude/mcp.json` (API keys go in `.env`):
+Pre-configured MCP servers in `.mcp.json` (API keys go in `.env`):
 
 | Server | Capabilities |
 |--------|-------------|
@@ -166,6 +166,7 @@ Pre-configured MCP servers in `.claude/mcp.json` (API keys go in `.env`):
 ├── CLAUDE.md                    # Main hub - Claude reads this first
 ├── CLAUDE.local.md              # Private notes (gitignored)
 ├── README.md                    # This file
+├── .mcp.json                    # MCP server configurations (project root)
 ├── install.sh                   # One-liner installer
 ├── update.sh                    # Deprecation wrapper → .claude/bin/update.sh
 ├── validate.sh                  # Config integrity checker
@@ -197,7 +198,6 @@ Pre-configured MCP servers in `.claude/mcp.json` (API keys go in `.env`):
     │   ├── token-2022.md            # Token Extensions guide (local)
     │   ├── backend-async.md         # Axum/Tokio patterns (local)
     │   └── deployment.md            # Deployment workflows (local)
-    ├── mcp.json                 # MCP server configurations
     ├── rules/                   # Auto-loading constraints
     └── settings.json            # Permissions, hooks, agent teams
 ```

@@ -18,7 +18,7 @@ echo ""
 # Setup: create target with existing .claude/ and user content
 mkdir -p "$TEMP_DIR/.claude/memory"
 echo '{"custom": true}' > "$TEMP_DIR/.claude/settings.json"
-echo '{"mcpServers": {"my-server": {}}}' > "$TEMP_DIR/.claude/mcp.json"
+echo '{"mcpServers": {"my-server": {}}}' > "$TEMP_DIR/.mcp.json"
 echo "# User memories" > "$TEMP_DIR/.claude/MEMORY.md"
 echo "mem1" > "$TEMP_DIR/.claude/memory/user_prefs.md"
 
@@ -40,7 +40,7 @@ assert_dir_exists "$TEMP_DIR/.claude/skills" "skills/ installed"
 
 # Assert: user files preserved
 assert_file_contains "$TEMP_DIR/.claude/settings.json" '"custom"' "User settings.json preserved"
-assert_file_contains "$TEMP_DIR/.claude/mcp.json" '"my-server"' "User mcp.json preserved"
+assert_file_contains "$TEMP_DIR/.mcp.json" '"my-server"' "User .mcp.json preserved at root"
 assert_file_contains "$TEMP_DIR/.claude/MEMORY.md" "User memories" "User MEMORY.md preserved"
 assert_file_exists "$TEMP_DIR/.claude/memory/user_prefs.md" "User memory/ dir preserved"
 

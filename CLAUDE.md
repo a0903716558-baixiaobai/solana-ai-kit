@@ -81,7 +81,7 @@ When X changes, also update Y:
 | **Skills** | `.claude/skills/` | Progressive loading; reference from `SKILL.md`; prefer code over prose |
 | **Commands** | `.claude/commands/` | Atomic (one command, one purpose); document inputs/outputs |
 | **Rules** | `.claude/rules/` | Minimal — they load on every matching file; use `globs` in frontmatter |
-| **MCP Servers** | `.claude/mcp.json` | Document env vars; test connectivity; update setup-mcp command |
+| **MCP Servers** | `.mcp.json` | Document env vars; test connectivity; update setup-mcp command |
 
 ## Agent Teams
 
@@ -129,4 +129,4 @@ All changes on feature branches: `git checkout -b <type>/<scope>-<description>-<
 
 ---
 
-**Main config**: `CLAUDE-solana.md` | **Agents**: `.claude/agents/` | **Skills**: `.claude/skills/` | **Commands**: `.claude/commands/` | **MCP**: `.claude/mcp.json` | **Rules**: `.claude/rules/`
+**Main config**: `CLAUDE-solana.md` | **Agents**: `.claude/agents/` | **Skills**: `.claude/skills/` | **Commands**: `.claude/commands/` | **MCP**: `.mcp.json` | **Rules**: `.claude/rules/`

@@ -45,6 +45,7 @@ if [ -n "${SOLANA_CLAUDE_LOCAL_SRC:-}" ] && [ -d "$SOLANA_CLAUDE_LOCAL_SRC/.clau
   mkdir -p "$TEMP_DIR/repo"
   cp -r "$SOLANA_CLAUDE_LOCAL_SRC/.claude" "$TEMP_DIR/repo/.claude"
   cp "$SOLANA_CLAUDE_LOCAL_SRC/CLAUDE-solana.md" "$TEMP_DIR/repo/CLAUDE-solana.md"
+  [ -f "$SOLANA_CLAUDE_LOCAL_SRC/.mcp.json" ] && cp "$SOLANA_CLAUDE_LOCAL_SRC/.mcp.json" "$TEMP_DIR/repo/.mcp.json"
   [ -f "$SOLANA_CLAUDE_LOCAL_SRC/.env.example" ] && cp "$SOLANA_CLAUDE_LOCAL_SRC/.env.example" "$TEMP_DIR/repo/.env.example"
   [ -f "$SOLANA_CLAUDE_LOCAL_SRC/.gitmodules" ] && cp "$SOLANA_CLAUDE_LOCAL_SRC/.gitmodules" "$TEMP_DIR/repo/.gitmodules"
   [ -f "$SOLANA_CLAUDE_LOCAL_SRC/.claude/VERSION" ] && cp "$SOLANA_CLAUDE_LOCAL_SRC/.claude/VERSION" "$TEMP_DIR/repo/.claude/VERSION"
@@ -81,11 +82,16 @@ for f in VERSION CHANGELOG.md; do
 done
 
 # Protected files: only copy if target doesn't exist yet
-for f in settings.json mcp.json MEMORY.md; do
+for f in settings.json MEMORY.md; do
   if [ -f "$TEMP_DIR/repo/.claude/$f" ] && [ ! -f "$TARGET_DIR/$CONFIG_DIR/$f" ]; then
     cp "$TEMP_DIR/repo/.claude/$f" "$TARGET_DIR/$CONFIG_DIR/$f"
   fi
 done
+
+# MCP config: lives at project root as .mcp.json (Claude Code only reads this path)
+if [ -f "$TEMP_DIR/repo/.mcp.json" ] && [ ! -f "$TARGET_DIR/.mcp.json" ]; then
+  cp "$TEMP_DIR/repo/.mcp.json" "$TARGET_DIR/.mcp.json"
+fi
 
 # Copy CLAUDE-solana.md as CLAUDE.md
 echo "Copying CLAUDE.md..."

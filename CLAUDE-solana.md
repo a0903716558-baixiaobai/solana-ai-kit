@@ -51,7 +51,7 @@ Every program change:
 ## MCP Servers
 <!-- API keys go in .env (gitignored). Run /setup-mcp to configure. -->
 
-MCP servers are configured in `.claude/mcp.json`. API keys go in `.env` (never in mcp.json). Available servers:
+MCP servers are configured in `.mcp.json`. API keys go in `.env` (never in mcp.json). Available servers:
 - **Helius** — 60+ tools: RPC, DAS API, webhooks, priority fees, token metadata
 - **solana-dev** — Solana Foundation official MCP: docs, guides, API references
 - **Context7** — Up-to-date library documentation lookup
@@ -108,5 +108,5 @@ In monorepos, add `CLAUDE.md` per package/module for scoped architecture decisio
 
 ---
 
-**Skills**: `.claude/skills/SKILL.md` | **Rules**: `.claude/rules/` | **Commands**: `.claude/commands/` | **Agents**: `.claude/agents/` | **MCP**: `.claude/mcp.json`
+**Skills**: `.claude/skills/SKILL.md` | **Rules**: `.claude/rules/` | **Commands**: `.claude/commands/` | **Agents**: `.claude/agents/` | **MCP**: `.mcp.json`
 <!-- Tip: Use @path/to/file.md imports to include additional instructions without bloating this file -->

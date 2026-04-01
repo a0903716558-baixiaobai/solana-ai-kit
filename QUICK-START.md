@@ -164,9 +164,9 @@ your-project/
 │   │   ├── token-2022.md     # Token Extensions guide
 │   │   ├── backend-async.md  # Axum/Tokio patterns
 │   │   └── deployment.md     # Deploy workflows
-│   ├── mcp.json           # MCP server configs
 │   ├── rules/             # Auto-loading rules
 │   └── settings.json      # Permissions
+├── .mcp.json              # MCP server configs (project root)
 ├── programs/              # Your Solana programs
 ├── app/                   # Your frontend
 └── ...
@@ -284,7 +284,7 @@ bash .claude/bin/update.sh
 - [.claude/agents/](./.claude/agents/) - All agent definitions
 - [.claude/commands/](./.claude/commands/) - All commands
 - [.claude/skills/](./.claude/skills/) - Knowledge base
-- [.claude/mcp.json](./.claude/mcp.json) - MCP server configs
+- [.mcp.json](./.mcp.json) - MCP server configs
 
 ---
 

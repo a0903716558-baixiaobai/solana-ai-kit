@@ -29,7 +29,7 @@ echo "# My custom local notes" > "$TEMP_DIR/CLAUDE.local.md"
 
 # Write custom user files to verify they survive reinstall
 echo '{"user_custom": true}' > "$TEMP_DIR/.claude/settings.json"
-echo '{"mcpServers": {"my-server": {}}}' > "$TEMP_DIR/.claude/mcp.json"
+echo '{"mcpServers": {"my-server": {}}}' > "$TEMP_DIR/.mcp.json"
 
 # Add custom content to CLAUDE.md to verify backup
 ORIGINAL_CLAUDE_MD="$(cat "$TEMP_DIR/CLAUDE.md")"
@@ -54,7 +54,7 @@ assert_file_exists "$TEMP_DIR/.claude/rules/rust.md" "Rules exist after 2nd inst
 
 # Verify user files were NOT overwritten (protected on reinstall)
 assert_file_contains "$TEMP_DIR/.claude/settings.json" "user_custom" "User settings.json preserved on 2nd install"
-assert_file_contains "$TEMP_DIR/.claude/mcp.json" "my-server" "User mcp.json preserved on 2nd install"
+assert_file_contains "$TEMP_DIR/.mcp.json" "my-server" "User .mcp.json preserved on 2nd install"
 
 # CLAUDE.local.md should be preserved (not overwritten)
 LOCAL_CONTENT="$(cat "$TEMP_DIR/CLAUDE.local.md")"
