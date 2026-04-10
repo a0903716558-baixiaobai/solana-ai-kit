@@ -22,10 +22,6 @@ SOLANA_CLAUDE_LOCAL_SRC="$REPO_ROOT" bash "$REPO_ROOT/install.sh" "$TEMP_DIR" >/
 assert_dir_exists "$TEMP_DIR/.claude" ".claude/ exists after 1st install"
 assert_file_exists "$TEMP_DIR/CLAUDE.md" "CLAUDE.md exists after 1st install"
 assert_file_not_exists "$TEMP_DIR/CLAUDE.md.bak" "No CLAUDE.md.bak after 1st install"
-assert_file_exists "$TEMP_DIR/CLAUDE.local.md" "CLAUDE.local.md exists after 1st install"
-
-# Capture CLAUDE.local.md content to verify it's preserved
-echo "# My custom local notes" > "$TEMP_DIR/CLAUDE.local.md"
 
 # Write custom user files to verify they survive reinstall
 echo '{"user_custom": true}' > "$TEMP_DIR/.claude/settings.json"
@@ -55,10 +51,6 @@ assert_file_exists "$TEMP_DIR/.claude/rules/rust.md" "Rules exist after 2nd inst
 # Verify user files were NOT overwritten (protected on reinstall)
 assert_file_contains "$TEMP_DIR/.claude/settings.json" "user_custom" "User settings.json preserved on 2nd install"
 assert_file_contains "$TEMP_DIR/.mcp.json" "my-server" "User .mcp.json preserved on 2nd install"
-
-# CLAUDE.local.md should be preserved (not overwritten)
-LOCAL_CONTENT="$(cat "$TEMP_DIR/CLAUDE.local.md")"
-assert_contains "$LOCAL_CONTENT" "My custom local notes" "CLAUDE.local.md content preserved"
 
 # .gitignore should not have duplicate entries
 EXT_DUPES=$(grep -c "skills/ext/" "$TEMP_DIR/.gitignore" | tr -d ' ')

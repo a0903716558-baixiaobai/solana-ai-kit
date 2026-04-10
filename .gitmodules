@@ -25,3 +25,6 @@
 [submodule ".claude/skills/ext/safe-solana-builder"]
 	path = .claude/skills/ext/safe-solana-builder
 	url = https://github.com/frankcastleauditor/safe-solana-builder.git
+[submodule ".claude/skills/ext/vercel"]
+	path = .claude/skills/ext/vercel
+	url = https://github.com/vercel-labs/agent-skills.git

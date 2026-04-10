@@ -55,9 +55,6 @@ assert_eq "24" "$CMD_COUNT" "Command count is 24"
 # CLAUDE.md should exist at project root
 assert_file_exists "$TEMP_DIR/CLAUDE.md" "CLAUDE.md exists at project root"
 
-# CLAUDE.local.md should exist
-assert_file_exists "$TEMP_DIR/CLAUDE.local.md" "CLAUDE.local.md exists"
-
 # .gitignore should have .agents/skills/ext/ entry
 assert_file_exists "$TEMP_DIR/.gitignore" ".gitignore exists"
 GITIGNORE_CONTENT="$(cat "$TEMP_DIR/.gitignore")"

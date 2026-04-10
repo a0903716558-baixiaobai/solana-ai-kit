@@ -29,7 +29,7 @@ fi
 
 # Read current version
 CURRENT_VERSION="unknown"
-[ -f "$TARGET_DIR/$CONFIG_NAME/VERSION" ] && CURRENT_VERSION="$(cat "$TARGET_DIR/$CONFIG_NAME/VERSION")"
+[ -f "$TARGET_DIR/$CONFIG_NAME/VERSION" ] && CURRENT_VERSION="$(awk '{print $NF}' "$TARGET_DIR/$CONFIG_NAME/VERSION")"
 
 TEMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TEMP_DIR"' EXIT
@@ -50,7 +50,7 @@ fi
 
 # Read new version
 NEW_VERSION="unknown"
-[ -f "$TEMP_DIR/repo/.claude/VERSION" ] && NEW_VERSION="$(cat "$TEMP_DIR/repo/.claude/VERSION")"
+[ -f "$TEMP_DIR/repo/.claude/VERSION" ] && NEW_VERSION="$(awk '{print $NF}' "$TEMP_DIR/repo/.claude/VERSION")"
 
 if [ "$CURRENT_VERSION" = "unknown" ]; then
   echo "Installing version tracking (first update)"
@@ -87,13 +87,37 @@ for dir in $UPDATE_DIRS; do
   fi
 done
 
-# Update .gitmodules
+# Merge .gitmodules (don't overwrite — user may have their own submodules)
 if [ -f "$TEMP_DIR/repo/.gitmodules" ]; then
-  if ! diff -q "$TEMP_DIR/repo/.gitmodules" "$TARGET_DIR/.gitmodules" >/dev/null 2>&1; then
-    CHANGES="$CHANGES  [updated] .gitmodules\n"
-  fi
-  if [ "$DRY_RUN" = false ]; then
-    cp "$TEMP_DIR/repo/.gitmodules" "$TARGET_DIR/.gitmodules"
+  if [ ! -f "$TARGET_DIR/.gitmodules" ]; then
+    if ! diff -q "$TEMP_DIR/repo/.gitmodules" "$TARGET_DIR/.gitmodules" >/dev/null 2>&1; then
+      CHANGES="$CHANGES  [updated] .gitmodules\n"
+    fi
+    if [ "$DRY_RUN" = false ]; then
+      cp "$TEMP_DIR/repo/.gitmodules" "$TARGET_DIR/.gitmodules"
+    fi
+  else
+    # Append submodule entries that don't already exist in target
+    ADDED_SUBMODS=""
+    while IFS= read -r line; do
+      if [[ "$line" =~ ^\[submodule\ \"(.+)\"\] ]]; then
+        submod="${BASH_REMATCH[1]}"
+        if ! grep -qF "[submodule \"$submod\"]" "$TARGET_DIR/.gitmodules"; then
+          ADDED_SUBMODS="$ADDED_SUBMODS $submod"
+          if [ "$DRY_RUN" = false ]; then
+            echo "" >> "$TARGET_DIR/.gitmodules"
+            echo "$line" >> "$TARGET_DIR/.gitmodules"
+            while IFS= read -r detail; do
+              [[ "$detail" =~ ^\[submodule ]] && break
+              [ -n "$detail" ] && echo "$detail" >> "$TARGET_DIR/.gitmodules"
+            done
+          fi
+        fi
+      fi
+    done < "$TEMP_DIR/repo/.gitmodules"
+    if [ -n "$ADDED_SUBMODS" ]; then
+      CHANGES="$CHANGES  [merged] .gitmodules (added:$ADDED_SUBMODS)\n"
+    fi
   fi
 fi
 
@@ -105,13 +129,7 @@ if [ -f "$TEMP_DIR/repo/.claude/VERSION" ]; then
   CHANGES="$CHANGES  [updated] $CONFIG_NAME/VERSION → $NEW_VERSION\n"
 fi
 
-# Update CHANGELOG.md
-if [ -f "$TEMP_DIR/repo/.claude/CHANGELOG.md" ]; then
-  if [ "$DRY_RUN" = false ]; then
-    cp "$TEMP_DIR/repo/.claude/CHANGELOG.md" "$TARGET_DIR/$CONFIG_NAME/CHANGELOG.md"
-  fi
-  CHANGES="$CHANGES  [updated] $CONFIG_NAME/CHANGELOG.md\n"
-fi
+# CHANGELOG.md stays in source repo — not shipped to user projects
 
 # Merge .env.example — append new vars without overwriting user edits
 # shellcheck source=_env_merge.sh
@@ -162,13 +180,7 @@ if [ -f "$TEMP_DIR/repo/CLAUDE-solana.md" ]; then
   fi
 fi
 
-# Create CLAUDE.local.md if missing
-if [ "$DRY_RUN" = false ] && [ ! -f "$TARGET_DIR/CLAUDE.local.md" ]; then
-  echo "# Local Notes (gitignored)" > "$TARGET_DIR/CLAUDE.local.md"
-  echo "" >> "$TARGET_DIR/CLAUDE.local.md"
-  echo "<!-- Claude writes here freely. Private to this machine. -->" >> "$TARGET_DIR/CLAUDE.local.md"
-  CHANGES="$CHANGES  [created] CLAUDE.local.md (private notes)\n"
-fi
+# CLAUDE.local.md is created organically by Claude when needed (gitignored)
 
 # Update submodules
 if [ "$DRY_RUN" = false ]; then
@@ -190,7 +202,4 @@ else
 fi
 
 echo ""
-if [ -f "$TARGET_DIR/$CONFIG_NAME/CHANGELOG.md" ]; then
-  echo "See $CONFIG_NAME/CHANGELOG.md for details on what changed in v$NEW_VERSION"
-fi
 echo "Update complete!"

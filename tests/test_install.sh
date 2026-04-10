@@ -41,9 +41,6 @@ GITIGNORE_CONTENT="$(cat "$TEMP_DIR/.gitignore")"
 assert_contains "$GITIGNORE_CONTENT" ".claude/skills/ext/" ".gitignore contains ext/ entry"
 assert_contains "$GITIGNORE_CONTENT" "CLAUDE.local.md" ".gitignore contains CLAUDE.local.md entry"
 
-# Check CLAUDE.local.md was created
-assert_file_exists "$TEMP_DIR/CLAUDE.local.md" "CLAUDE.local.md exists"
-
 # Check .claude/VERSION exists
 assert_file_exists "$TEMP_DIR/.claude/VERSION" ".claude/VERSION file exists"
 

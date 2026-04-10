@@ -120,6 +120,12 @@ From [Colosseum](ext/colosseum/skills/colosseum-copilot/):
 
 - [ext/colosseum/skills/colosseum-copilot/SKILL.md](ext/colosseum/skills/colosseum-copilot/SKILL.md) — Solana startup research: idea validation, competitive analysis, hackathon project discovery (5,400+ submissions), crypto archives, and The Grid ecosystem data. Requires `COLOSSEUM_COPILOT_PAT`.
 
+## Vercel & Deployment Platforms
+
+From [Vercel](ext/vercel/):
+
+- [ext/vercel/skills/](ext/vercel/skills/) — Vercel deployment, Next.js patterns, AI SDK, v0, edge functions, serverless optimization
+
 ## Backend
 
 - [backend-async.md](backend-async.md) — Axum 0.8/Tokio patterns, spawn_blocking, RPC integration, Redis caching
@@ -151,3 +157,4 @@ From [Colosseum](ext/colosseum/skills/colosseum-copilot/):
 | Formal verification, proofs | ext/qedgen → SKILL.md |
 | Idea validation, competitive research, hackathon projects | ext/colosseum → colosseum-copilot/SKILL.md |
 | Security-first scaffolding, safe code generation | ext/safe-solana-builder → SKILL.md |
+| Vercel deployment, Next.js, AI SDK, v0 | ext/vercel → skills/ |

@@ -49,7 +49,7 @@ if [ -n "${SOLANA_CLAUDE_LOCAL_SRC:-}" ] && [ -d "$SOLANA_CLAUDE_LOCAL_SRC/.clau
   [ -f "$SOLANA_CLAUDE_LOCAL_SRC/.env.example" ] && cp "$SOLANA_CLAUDE_LOCAL_SRC/.env.example" "$TEMP_DIR/repo/.env.example"
   [ -f "$SOLANA_CLAUDE_LOCAL_SRC/.gitmodules" ] && cp "$SOLANA_CLAUDE_LOCAL_SRC/.gitmodules" "$TEMP_DIR/repo/.gitmodules"
   [ -f "$SOLANA_CLAUDE_LOCAL_SRC/.claude/VERSION" ] && cp "$SOLANA_CLAUDE_LOCAL_SRC/.claude/VERSION" "$TEMP_DIR/repo/.claude/VERSION"
-  [ -f "$SOLANA_CLAUDE_LOCAL_SRC/.claude/CHANGELOG.md" ] && cp "$SOLANA_CLAUDE_LOCAL_SRC/.claude/CHANGELOG.md" "$TEMP_DIR/repo/.claude/CHANGELOG.md"
+  # CHANGELOG.md stays in the repo — not shipped to user projects
 else
   # Clone repo with submodules
   echo "Cloning repository..."
@@ -57,7 +57,7 @@ else
 fi
 
 # Read version from source
-[ -f "$TEMP_DIR/repo/.claude/VERSION" ] && SCRIPT_VERSION="$(cat "$TEMP_DIR/repo/.claude/VERSION")"
+[ -f "$TEMP_DIR/repo/.claude/VERSION" ] && SCRIPT_VERSION="$(awk '{print $NF}' "$TEMP_DIR/repo/.claude/VERSION")"
 
 echo "Installing Solana Claude Config v$SCRIPT_VERSION to: $TARGET_DIR ($CONFIG_DIR/)"
 
@@ -76,17 +76,13 @@ for dir in agents skills rules commands bin; do
   fi
 done
 
-# VERSION + CHANGELOG: always overwrite
-for f in VERSION CHANGELOG.md; do
-  [ -f "$TEMP_DIR/repo/.claude/$f" ] && cp "$TEMP_DIR/repo/.claude/$f" "$TARGET_DIR/$CONFIG_DIR/$f"
-done
+# VERSION: always overwrite (CHANGELOG stays in source repo only)
+[ -f "$TEMP_DIR/repo/.claude/VERSION" ] && cp "$TEMP_DIR/repo/.claude/VERSION" "$TARGET_DIR/$CONFIG_DIR/VERSION"
 
 # Protected files: only copy if target doesn't exist yet
-for f in settings.json MEMORY.md; do
-  if [ -f "$TEMP_DIR/repo/.claude/$f" ] && [ ! -f "$TARGET_DIR/$CONFIG_DIR/$f" ]; then
-    cp "$TEMP_DIR/repo/.claude/$f" "$TARGET_DIR/$CONFIG_DIR/$f"
-  fi
-done
+if [ -f "$TEMP_DIR/repo/.claude/settings.json" ] && [ ! -f "$TARGET_DIR/$CONFIG_DIR/settings.json" ]; then
+  cp "$TEMP_DIR/repo/.claude/settings.json" "$TARGET_DIR/$CONFIG_DIR/settings.json"
+fi
 
 # MCP config: lives at project root as .mcp.json (Claude Code only reads this path)
 if [ -f "$TEMP_DIR/repo/.mcp.json" ] && [ ! -f "$TARGET_DIR/.mcp.json" ]; then
@@ -101,9 +97,27 @@ if [ -f "$TARGET_DIR/CLAUDE.md" ]; then
 fi
 cp "$TEMP_DIR/repo/CLAUDE-solana.md" "$TARGET_DIR/CLAUDE.md"
 
-# Copy .gitmodules if it exists
+# Merge .gitmodules (don't overwrite — user may have their own submodules)
 if [ -f "$TEMP_DIR/repo/.gitmodules" ]; then
-  cp "$TEMP_DIR/repo/.gitmodules" "$TARGET_DIR/.gitmodules"
+  if [ ! -f "$TARGET_DIR/.gitmodules" ]; then
+    cp "$TEMP_DIR/repo/.gitmodules" "$TARGET_DIR/.gitmodules"
+  else
+    # Append submodule entries that don't already exist in target
+    while IFS= read -r line; do
+      if [[ "$line" =~ ^\[submodule\ \"(.+)\"\] ]]; then
+        submod="${BASH_REMATCH[1]}"
+        if ! grep -qF "[submodule \"$submod\"]" "$TARGET_DIR/.gitmodules"; then
+          echo "" >> "$TARGET_DIR/.gitmodules"
+          echo "$line" >> "$TARGET_DIR/.gitmodules"
+          # Read and append path + url lines
+          while IFS= read -r detail; do
+            [[ "$detail" =~ ^\[submodule ]] && break
+            [ -n "$detail" ] && echo "$detail" >> "$TARGET_DIR/.gitmodules"
+          done
+        fi
+      fi
+    done < "$TEMP_DIR/repo/.gitmodules"
+  fi
 fi
 
 # Initialize submodules in target
@@ -126,14 +140,7 @@ else
   echo "Created .gitignore with $EXT_PATTERN"
 fi
 
-# Create CLAUDE.local.md (private notes, gitignored)
-if [ ! -f "$TARGET_DIR/CLAUDE.local.md" ]; then
-  echo "# Local Notes (gitignored)" > "$TARGET_DIR/CLAUDE.local.md"
-  echo "" >> "$TARGET_DIR/CLAUDE.local.md"
-  echo "<!-- Claude writes here freely. Private to this machine. -->" >> "$TARGET_DIR/CLAUDE.local.md"
-fi
-
-# Add CLAUDE.local.md to .gitignore
+# Add CLAUDE.local.md to .gitignore (Claude creates it organically when needed)
 if ! grep -qF "CLAUDE.local.md" "$GITIGNORE"; then
   echo "CLAUDE.local.md" >> "$GITIGNORE"
 fi

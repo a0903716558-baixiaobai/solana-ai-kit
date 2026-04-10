@@ -92,6 +92,7 @@ This guides you through API key configuration for Helius, Context7, and other MC
 | `ext/solana-mobile` | [nicoorfi/solana-mobile](https://github.com/nicoorfi/solana-mobile) | Mobile Wallet Adapter, Genesis Token, SKR address resolution |
 | `ext/colosseum` | [ColosseumOrg/colosseum-copilot](https://github.com/ColosseumOrg/colosseum-copilot) | Startup research, idea validation, hackathon projects (proprietary license) |
 | `ext/safe-solana-builder` | [frankcastleauditor/safe-solana-builder](https://github.com/frankcastleauditor/safe-solana-builder) | Security-first code generation (70+ audit-derived rules) |
+| `ext/vercel` | [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) | Vercel deployment, Next.js, AI SDK, v0, edge functions |
 
 ### Agent Teams
 
@@ -164,7 +165,6 @@ Pre-configured MCP servers in `.mcp.json` (API keys go in `.env`):
 ```
 .
 ├── CLAUDE.md                    # Main hub - Claude reads this first
-├── CLAUDE.local.md              # Private notes (gitignored)
 ├── README.md                    # This file
 ├── .mcp.json                    # MCP server configurations (project root)
 ├── install.sh                   # One-liner installer
@@ -176,8 +176,7 @@ Pre-configured MCP servers in `.mcp.json` (API keys go in `.env`):
 │   ├── ci.yml                       # PR validation
 │   └── claude-code.yml              # Claude Code action template
 └── .claude/
-    ├── VERSION                  # Semver version (e.g. 1.1.0)
-    ├── CHANGELOG.md             # Release notes
+    ├── VERSION                  # Semver version (e.g. 1.4.0)
     ├── agents/                  # 15 specialized agents
     ├── bin/
     │   ├── update.sh                # In-place update from upstream
@@ -194,7 +193,8 @@ Pre-configured MCP servers in `.mcp.json` (API keys go in `.env`):
     │   │   ├── qedgen/                # QEDGen formal verification (Lean 4)
     │   │   ├── solana-mobile/           # Mobile Wallet Adapter, Genesis Token
     │   │   ├── colosseum/              # Colosseum Copilot (startup research)
-    │   │   └── safe-solana-builder/   # Security-first code generation
+    │   │   ├── safe-solana-builder/   # Security-first code generation
+    │   │   └── vercel/                # Vercel deployment, Next.js, AI SDK
     │   ├── token-2022.md            # Token Extensions guide (local)
     │   ├── backend-async.md         # Axum/Tokio patterns (local)
     │   └── deployment.md            # Deployment workflows (local)

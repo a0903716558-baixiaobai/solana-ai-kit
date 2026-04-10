@@ -2,6 +2,24 @@
 
 All notable changes to solana-claude-config.
 
+## [1.4.0] - 2026-04-02
+
+### Added
+- **Vercel submodule**: `ext/vercel` from [vercel-labs/agent-skills](https://github.com/vercel-labs/agent-skills) — Vercel deployment, Next.js, AI SDK, v0, edge functions
+- SKILL.md routing for Vercel & deployment platform skills
+
+### Changed
+- **VERSION format**: Now includes package name (`solana-claude-config 1.4.0`) for clarity
+- **install.sh / update.sh**: `.gitmodules` merge instead of overwrite — preserves user-defined submodules
+- **install.sh / update.sh**: No longer ship `CHANGELOG.md` to user projects (stays in source repo)
+- **install.sh / update.sh**: No longer ship `MEMORY.md` template (Claude creates it organically)
+- **install.sh / update.sh**: No longer create `CLAUDE.local.md` boilerplate (Claude creates it when needed)
+
+### Removed
+- `CHANGELOG.md` from install/update targets (maintainer-only file)
+- `MEMORY.md` from install protected files (interfered with organic memory)
+- `CLAUDE.local.md` boilerplate creation (Claude handles this itself)
+
 ## [1.3.0] - 2026-04-01
 
 ### Fixed

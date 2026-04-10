@@ -82,7 +82,6 @@ assert_dir_not_exists "$TEMP_DIR/tests" "tests/ removed"
 # Preserved files should still exist
 assert_file_exists "$TEMP_DIR/.env" ".env preserved after cleanup"
 assert_file_contains "$TEMP_DIR/.env" "my-secret-key" ".env content preserved"
-assert_file_exists "$TEMP_DIR/CLAUDE.local.md" "CLAUDE.local.md preserved after cleanup"
 assert_file_exists "$TEMP_DIR/.gitignore" ".gitignore preserved after cleanup"
 
 print_summary

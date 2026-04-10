@@ -100,7 +100,7 @@ echo ""
 # --- Versioning ---
 echo "[Versioning]"
 if [ -f .claude/VERSION ]; then
-  if grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$' .claude/VERSION; then
+  if grep -qE '(^|[[:space:]])[0-9]+\.[0-9]+\.[0-9]+$' .claude/VERSION; then
     check ".claude/VERSION follows semver" 0
   else
     check ".claude/VERSION follows semver" 1

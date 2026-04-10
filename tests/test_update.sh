@@ -26,22 +26,18 @@ assert_dir_exists "$TEMP_DIR/.claude/agents" "agents/ preserved"
 assert_dir_exists "$TEMP_DIR/.claude/commands" "commands/ preserved"
 assert_file_exists "$TEMP_DIR/.claude/skills/SKILL.md" "SKILL.md preserved"
 assert_json_valid "$TEMP_DIR/.claude/settings.json" "settings.json still valid"
-assert_file_exists "$TEMP_DIR/CLAUDE.local.md" "CLAUDE.local.md created by update"
 assert_file_exists "$TEMP_DIR/.claude/VERSION" ".claude/VERSION exists after update"
 
 # --- VERSION is valid semver ---
 VERSION_CONTENT="$(cat "$TEMP_DIR/.claude/VERSION")"
 TOTAL=$((TOTAL + 1))
-if echo "$VERSION_CONTENT" | grep -qE '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+if echo "$VERSION_CONTENT" | grep -qE '(^|[[:space:]])[0-9]+\.[0-9]+\.[0-9]+$'; then
   echo "  PASS: VERSION content is valid semver ($VERSION_CONTENT)"
   PASS=$((PASS + 1))
 else
   echo "  FAIL: VERSION content is not valid semver ($VERSION_CONTENT)"
   FAIL=$((FAIL + 1))
 fi
-
-# --- CHANGELOG.md exists ---
-assert_file_exists "$TEMP_DIR/.claude/CHANGELOG.md" "CHANGELOG.md exists after update"
 
 # --- Counts after update ---
 assert_count "$TEMP_DIR/.claude/agents" "*.md" "15" "Agent count == 15 after update"
@@ -69,11 +65,6 @@ echo "[protected files]"
 echo "MY_SECRET=preserved" > "$TEMP_DIR/.env"
 (cd "$TEMP_DIR" && SOLANA_CLAUDE_LOCAL_SRC="$REPO_ROOT" bash .claude/bin/update.sh) >/dev/null 2>&1
 assert_file_contains "$TEMP_DIR/.env" "MY_SECRET=preserved" ".env not overwritten by update"
-
-# --- CLAUDE.local.md preserved ---
-echo "# Custom local content" > "$TEMP_DIR/CLAUDE.local.md"
-(cd "$TEMP_DIR" && SOLANA_CLAUDE_LOCAL_SRC="$REPO_ROOT" bash .claude/bin/update.sh) >/dev/null 2>&1
-assert_file_contains "$TEMP_DIR/CLAUDE.local.md" "Custom local content" "CLAUDE.local.md preserved by update"
 
 # --- Agents mode ---
 echo "[agents mode]"

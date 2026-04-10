@@ -160,7 +160,8 @@ your-project/
 │   │   │   ├── qedgen/            # Formal verification (Lean 4)
 │   │   │   ├── solana-mobile/     # Mobile Wallet Adapter
 │   │   │   ├── colosseum/         # Startup research (Colosseum)
-│   │   │   └── safe-solana-builder/ # Security-first code gen
+│   │   │   ├── safe-solana-builder/ # Security-first code gen
+│   │   │   └── vercel/             # Vercel, Next.js, AI SDK
 │   │   ├── token-2022.md     # Token Extensions guide
 │   │   ├── backend-async.md  # Axum/Tokio patterns
 │   │   └── deployment.md     # Deploy workflows
