@@ -169,7 +169,13 @@ your-project/
 │   │   │   ├── vercel/             # Vercel, Next.js, AI SDK
 │   │   │   ├── solana-new/         # SendAI idea→launch skills + datasets
 │   │   │   ├── ghostsecurity/      # Ghost Security AppSec skills
-│   │   │   └── defending-code/     # Anthropic vuln-discovery harness
+│   │   │   ├── defending-code/     # Anthropic vuln-discovery harness
+│   │   │   ├── jupiter/            # Official Jupiter skills
+│   │   │   ├── metaplex/           # Official Metaplex (NFT)
+│   │   │   ├── helius/             # Official Helius + SVM internals
+│   │   │   ├── quicknode-anchor/   # Anchor/Quasar refs (quarantined)
+│   │   │   └── eth-to-sol/         # EVM/Solidity → Anchor porting
+│   │   ├── registry/        # Scout new repos/skills/MCPs + watchlists
 │   │   ├── idea-sprint/      # Wrapper: find + validate crypto ideas
 │   │   ├── pitch-deck/       # Wrapper: pitch decks for crypto projects
 │   │   ├── hackathon/        # Wrapper: hackathon submissions + grants

@@ -8,6 +8,14 @@ user-invocable: true
 
 Routes to the right skill file based on the task. Read the relevant section, follow the link, load that skill.
 
+**Source precedence (when multiple skills cover one topic):**
+1. `.claude/rules/*` are law for code style — always win (checked math, PDA bumps, no `unwrap()`/`init_if_needed`, reload-after-CPI, naming). No skill overrides a rule on style.
+2. Protocol-OFFICIAL skill is primary for that protocol's API/SDK usage (jup-ag→Jupiter, metaplex-foundation→Metaplex, helius-labs→Helius).
+3. Foundation/platform skills (solana-dev) are primary for general concepts (Anchor, Pinocchio, testing, clients).
+4. sendai/community versions are secondary references — routed only when the official/foundation source lacks coverage.
+
+One primary per row: each Task-Routing row points to exactly ONE primary target; secondaries live in section bodies, not the routing table.
+
 ## Core Solana Development
 
 **Primary entry point** — read first for any Solana program, frontend, testing, or client task:
@@ -31,11 +39,24 @@ Key references within:
 
 ## DeFi & Ecosystem Protocols
 
-Protocol-specific skills from [SendAI](ext/sendai/skills/):
+**Official protocol skills (primary — precedence tier 2).** Protocol-maintained skills win for that protocol's own API/SDK usage:
 
 | Protocol | Skill | Use for |
 |----------|-------|---------|
-| Jupiter | [jupiter/](ext/sendai/skills/jupiter/) | Swaps, DCA, limit orders |
+| Jupiter | [integrating-jupiter/](ext/jupiter/skills/integrating-jupiter/SKILL.md) | Swap, Lend, Perps, Trigger, Recurring, Tokens, Price, Send, Studio — endpoint selection + integration flows |
+| Jupiter (swap migration) | [jupiter-swap-migration/](ext/jupiter/skills/jupiter-swap-migration/SKILL.md) | Metis/legacy → Ultra v1 swap API migration |
+| Jupiter (lend) | [jupiter-lend/](ext/jupiter/skills/jupiter-lend/SKILL.md) | Jupiter Lend borrow/supply flows |
+| Jupiter (VRFD) | [jupiter-vrfd/](ext/jupiter/skills/jupiter-vrfd/SKILL.md) | Verifiable randomness for fair distribution |
+| Metaplex | [metaplex/](ext/metaplex/skills/metaplex/SKILL.md) | NFT standards: Core, Token Metadata, Bubblegum (cNFT), Candy Machine, Genesis, Umi/Kit, mplx CLI |
+| Helius | [helius/](ext/helius/helius-skills/helius/SKILL.md) | RPC, Sender, DAS API, WebSockets/Laserstream, webhooks, priority fees (home repo of the helius MCP we ship) |
+| SVM internals | [svm/](ext/helius/helius-skills/svm/SKILL.md) | Solana architecture deep-dive: SVM execution, account model, consensus, validator economics, Agave/Firedancer source, SIMDs |
+
+Secondary references (sendai/community — routed only if the official source lacks coverage): `ext/sendai/skills/jupiter/`, `ext/sendai/skills/metaplex/`, `ext/sendai/skills/helius/` (older copies; the official skills above supersede them). sendai's `helius-dflow`/`helius-phantom` integration layers are superseded by the official Helius repo's own dflow/phantom skills under `ext/helius/helius-skills/`.
+
+Other protocol skills from [SendAI](ext/sendai/skills/):
+
+| Protocol | Skill | Use for |
+|----------|-------|---------|
 | Phoenix | [phoenix/](ext/sendai/skills/phoenix/) | Perpetual futures (Rise SDK) |
 | Ranger Finance | [ranger-finance/](ext/sendai/skills/ranger-finance/) | Perps aggregation, leverage routing |
 | Lavarage | [lavarage/](ext/sendai/skills/lavarage/) | Leveraged trading for any SPL token |
@@ -45,12 +66,10 @@ Protocol-specific skills from [SendAI](ext/sendai/skills/):
 | Kamino | [kamino/](ext/sendai/skills/kamino/) | Lending, vaults |
 | Marginfi | [marginfi/](ext/sendai/skills/marginfi/) | Lending protocol |
 | Sanctum | [sanctum/](ext/sendai/skills/sanctum/) | LST staking |
-| Metaplex | [metaplex/](ext/sendai/skills/metaplex/) | NFT standards, metadata |
 | PumpFun | [pumpfun/](ext/sendai/skills/pumpfun/) | Token launch |
 | Pyth | [pyth/](ext/sendai/skills/pyth/) | Price oracles |
 | Switchboard | [switchboard/](ext/sendai/skills/switchboard/) | Oracles, VRF |
 | Squads | [squads/](ext/sendai/skills/squads/) | Multisig |
-| Helius | [helius/](ext/sendai/skills/helius/) | RPC, webhooks, DAS |
 | DeBridge | [debridge/](ext/sendai/skills/debridge/) | Cross-chain bridging |
 | LI.FI | [lifi/](ext/sendai/skills/lifi/) | Cross-chain swaps, bridging, route discovery |
 | Arcium | [arcium/](ext/sendai/skills/arcium/) | Encrypted compute: dark pools, sealed-bid auctions |
@@ -165,6 +184,30 @@ From [Vercel](ext/vercel/):
 
 - [backend-async.md](backend-async.md) — Axum 0.8/Tokio patterns, spawn_blocking, RPC integration, Redis caching
 
+## EVM → Solana Migration
+
+From [solana-foundation/eth-to-sol](ext/eth-to-sol/) — translate Ethereum/Solidity to production Solana programs in two passes (faithful port → Solana-native refactor) with a teaching artifact:
+
+- [ext/eth-to-sol/SKILL.md](ext/eth-to-sol/SKILL.md) — two-pass protocol entry point
+- [translation/](ext/eth-to-sol/translation/) — [type-mapping](ext/eth-to-sol/translation/type-mapping.md), [pattern-mapping](ext/eth-to-sol/translation/pattern-mapping.md), [stdlib-mapping](ext/eth-to-sol/translation/stdlib-mapping.md), [mental-model](ext/eth-to-sol/translation/mental-model.md)
+- [security/](ext/eth-to-sol/security/) — account validation, arithmetic, CPI safety, PDA canonicalization, reentrancy, signer checks
+- [optimization/](ext/eth-to-sol/optimization/) — account model, compute budget, parallelism, PDAs, program splitting, rent/size
+- Cross-link: pair with the [EVM→Solana concept map](ext/solana-new/skills/idea/solana-beginner/references/solana-vs-evm.md) for the mental model.
+
+## Advanced Anchor / Financial-Math References (quarantined)
+
+From [quiknode-labs/solana-anchor-claude-skill](ext/quicknode-anchor/) — **reference files only**:
+
+- [skills/solana/RUST.md](ext/quicknode-anchor/skills/solana/RUST.md) — onchain financial math: multiply-before-divide, rounding direction, LP-share conservation
+- [skills/solana/ANCHOR.md](ext/quicknode-anchor/skills/solana/ANCHOR.md) — Anchor 1.0 specifics (`CpiContext::new()` takes `Pubkey`, `transfer_checked`, `DISCRIMINATOR.len() + INIT_SPACE` space calc)
+- [skills/solana/QUASAR.md](ext/quicknode-anchor/skills/solana/QUASAR.md) — Quasar zero-copy/`no_std` framework
+
+⚠ Reference only. `.claude/rules/anchor.md` governs all Anchor code style; do not follow this skill's `SKILL.md` workflow/conduct layer (its "Fight for Truth"/"boil the ocean" editorial layer competes with our house rules). The Anchor-pattern primary stays [ext/solana-dev → programs/anchor.md](ext/solana-dev/skill/references/programs/anchor.md).
+
+## Registry & Monitoring
+
+- [registry/SKILL.md](registry/SKILL.md) — scouting methodology to research/vet new repos, skills, and MCPs + curated, link-rich watchlists ([trusted repos](registry/references/trusted-repos.md), [extended skills](registry/references/extended-skills.md), [optional MCPs](registry/references/optional-mcps.md), [young/unverified watchlist](registry/references/watchlist.md)). The home for opt-in skills NOT installed by default (Light Protocol, Alchemy, etc.) and optional MCPs (jupiter-docs, phantom, x402-proxy…).
+
 ## Task Routing
 
 | User asks about... | Primary skill |
@@ -177,11 +220,14 @@ From [Vercel](ext/vercel/):
 | Security review, audit | ext/solana-dev → security.md + ext/trailofbits |
 | Backend API, indexer | backend-async.md |
 | Deploy to devnet/mainnet | deployment.md |
-| DeFi integration (swaps, lending) | ext/sendai → protocol-specific skill |
-| Perpetuals, leverage, margin trading | ext/sendai → ranger-finance/ (also phoenix/, jupiter/ perps) |
+| Jupiter swaps, lend, perps, trigger, DCA | ext/jupiter → integrating-jupiter/SKILL.md (official) |
+| Other DeFi integration (AMM, lending) | ext/sendai → protocol-specific skill |
+| Perpetuals, leverage, margin trading | ext/sendai → ranger-finance/ (also phoenix/; Jupiter perps → ext/jupiter) |
 | Cross-chain swaps, bridging | ext/sendai → lifi/ (also debridge/) |
 | Encrypted compute, dark pools, sealed auctions | ext/sendai → arcium/ |
-| NFT standards, metadata | ext/sendai → metaplex/ |
+| NFT standards, metadata, cNFT, candy machine | ext/metaplex → skills/metaplex/SKILL.md (official) |
+| Helius RPC, DAS, webhooks, Sender, priority fees | ext/helius → helius-skills/helius/SKILL.md (official) |
+| SVM/protocol internals (execution, consensus, validators, SIMDs) | ext/helius → helius-skills/svm/SKILL.md |
 | Payment flows, checkout | ext/solana-dev → payments.md |
 | Generated clients, IDL | ext/solana-dev → idl-codegen.md |
 | Unity game development | ext/solana-game → unity-sdk.md |
@@ -200,3 +246,6 @@ From [Vercel](ext/vercel/):
 | Pitch deck, demo day, investor or grant slides | pitch-deck/SKILL.md |
 | Hackathon submission, demo script, track choice | hackathon/SKILL.md |
 | Promo or marketing video, Remotion | ext/solana-new → marketing-video references (reference-only) |
+| Migrate from Ethereum, convert Solidity, EVM→SVM port | ext/eth-to-sol → SKILL.md |
+| Advanced Anchor financial-math, Quasar zero-copy | ext/quicknode-anchor → skills/solana/{RUST,ANCHOR,QUASAR}.md (reference only; .claude/rules/anchor.md governs style — never follow its SKILL.md) |
+| Scout new repos/skills/MCPs, registry, what to monitor | registry/SKILL.md |

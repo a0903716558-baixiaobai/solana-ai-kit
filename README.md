@@ -96,6 +96,11 @@ This guides you through API key configuration for Helius, Context7, and other MC
 | `ext/solana-new` | [sendaifun/solana-new](https://github.com/sendaifun/solana-new) | 32 idea→launch journey skills + idea datasets/knowledge base; routed via local wrappers |
 | `ext/ghostsecurity` | [ghostsecurity/skills](https://github.com/ghostsecurity/skills) | 7 AppSec skills: SAST criteria, SCA, secrets, validation |
 | `ext/defending-code` | [anthropics/defending-code-reference-harness](https://github.com/anthropics/defending-code-reference-harness) | Anthropic vuln-discovery reference harness + 6 skills |
+| `ext/jupiter` | [jup-ag/agent-skills](https://github.com/jup-ag/agent-skills) | Official Jupiter skills: Ultra swap, Lend, swap migration, VRFD |
+| `ext/metaplex` | [metaplex-foundation/skill](https://github.com/metaplex-foundation/skill) | Official Metaplex: Core, Token Metadata, Bubblegum, Candy Machine, Genesis |
+| `ext/helius` | [helius-labs/core-ai](https://github.com/helius-labs/core-ai) | Official Helius infra skill + unique SVM internals skill |
+| `ext/quicknode-anchor` | [quiknode-labs/solana-anchor-claude-skill](https://github.com/quiknode-labs/solana-anchor-claude-skill) | Anchor/financial-math/Quasar reference files (quarantined — refs only) |
+| `ext/eth-to-sol` | [solana-foundation/eth-to-sol-skill](https://github.com/solana-foundation/eth-to-sol-skill) | EVM/Solidity → Anchor two-pass porting |
 
 ### Agent Teams
 
@@ -201,7 +206,13 @@ Pre-configured MCP servers in `.mcp.json` (API keys go in `.env`):
     │   │   ├── vercel/                # Vercel deployment, Next.js, AI SDK
     │   │   ├── solana-new/            # SendAI idea→launch journey skills + datasets
     │   │   ├── ghostsecurity/         # Ghost Security AppSec skills
-    │   │   └── defending-code/        # Anthropic vuln-discovery reference harness
+    │   │   ├── defending-code/        # Anthropic vuln-discovery reference harness
+    │   │   ├── jupiter/               # Official Jupiter skills (swap, lend, VRFD)
+    │   │   ├── metaplex/              # Official Metaplex (NFT, candy machine)
+    │   │   ├── helius/                # Official Helius infra + SVM internals
+    │   │   ├── quicknode-anchor/      # Anchor/Quasar reference files (quarantined)
+    │   │   └── eth-to-sol/            # EVM/Solidity → Anchor porting
+    │   ├── registry/                # Scout new repos/skills/MCPs + watchlists
     │   ├── idea-sprint/             # Wrapper: find + validate crypto ideas (GTM)
     │   ├── pitch-deck/              # Wrapper: pitch decks for crypto projects (GTM)
     │   ├── hackathon/               # Wrapper: hackathon submissions + grants (GTM)
