@@ -17,7 +17,21 @@ Marks module containing instruction entrypoints and business logic.
 Lists accounts an instruction requires with automatic constraint enforcement.
 
 ### `#[error_code]`
-Enables custom error types with `#[msg(...)]` attributes.
+Enables custom error types with `#[msg(...)]` attributes. **Anchor 1.0:** only ONE `#[error_code]` enum is allowed per program.
+
+### `declare_program!()`
+Generates a CPI + client module from another program's on-chain IDL (resolved via Program Metadata). The 1.0 standard for cross-program calls and for consuming external programs; legacy IDL instructions were removed.
+
+## Anchor 1.0 Breaking Changes (vs 0.31)
+
+Targets **Solana 3.x / Agave** and bundles its own toolchain (no external `solana` CLI dependency). Key deltas this file already reflects:
+- TS client package renamed `@coral-xyz/anchor` → **`@anchor-lang/core`**.
+- `CpiContext::new(...)` / `new_with_signer(...)` take the program **`Pubkey`** (`.key()`), not an `AccountInfo`.
+- SPL token CPIs use **`transfer_checked`** (mint + decimals); plain `transfer` is deprecated.
+- Space calc uses **`T::DISCRIMINATOR.len() + T::INIT_SPACE`** (no magic `8`).
+- **Duplicate mutable accounts are disallowed by default.**
+- Only one `#[error_code]` enum per program; legacy IDL instructions removed (use Program Metadata + `declare_program!`).
+- Default test template is **LiteSVM (Rust)**; `anchor test`/`anchor localnet` use **Surfpool**, not `solana-test-validator`.
 
 ## Account Types
 
@@ -38,7 +52,7 @@ Enables custom error types with `#[msg(...)]` attributes.
 #[account(
     init,
     payer = payer,
-    space = 8 + CustomAccount::INIT_SPACE,
+    space = CustomAccount::DISCRIMINATOR.len() + CustomAccount::INIT_SPACE,
     seeds = [b"vault", authority.key().as_ref()],
     bump
 )]
@@ -99,14 +113,14 @@ pub account: Account<'info, CustomAccount>,
 pub vault: Account<'info, Vault>,
 ```
 
-## Account Discriminators (Anchor 0.31+)
+## Account Discriminators (Anchor 1.0)
 
 Default: `sha256("account:<StructName>")[0..8]`. Custom:
 ```rust
 #[account(discriminator = 1)]
 pub struct Escrow { ... }
 ```
-**Rules:** Must be unique; `[0]` conflicts with uninitialized accounts; `[1]` prevents `[1, 2, ...]`.
+**Rules:** Must be unique; `[0]` conflicts with uninitialized accounts; `[1]` prevents `[1, 2, ...]`. Reference the discriminator length via `Account::DISCRIMINATOR.len()` (see space calc below) instead of hardcoding `8`.
 
 ## PDA Management (CRITICAL)
 
@@ -140,9 +154,15 @@ pub fn withdraw(ctx: Context<Withdraw>, amount: u64) -> Result<()> {
     ];
     let signer_seeds = &[&seeds[..]];
 
-    token::transfer(
-        CpiContext::new_with_signer(/* ... */, signer_seeds),
+    // Anchor 1.0: CpiContext takes the program Pubkey (.key()), not AccountInfo
+    transfer_checked(
+        CpiContext::new_with_signer(
+            ctx.accounts.token_program.key(),
+            /* TransferChecked { mint, from, to, authority } */,
+            signer_seeds,
+        ),
         amount,
+        decimals,
     )?;
     Ok(())
 }
@@ -221,16 +241,22 @@ let data = ctx.accounts.account.data
 ## Cross-Program Invocations (CPIs)
 
 ### Basic CPI
+
+Anchor 1.0: `CpiContext` takes the program **`Pubkey`** (`.key()`), not an `AccountInfo`. Use `transfer_checked` for SPL token transfers — plain `transfer` is deprecated.
+
 ```rust
-let cpi_accounts = Transfer {
+use anchor_spl::token_interface::{transfer_checked, TransferChecked};
+
+let cpi_accounts = TransferChecked {
+    mint: ctx.accounts.mint.to_account_info(),
     from: ctx.accounts.from.to_account_info(),
     to: ctx.accounts.to.to_account_info(),
     authority: ctx.accounts.authority.to_account_info(),
 };
-let cpi_program = ctx.accounts.token_program.to_account_info();
+let cpi_program = ctx.accounts.token_program.key();  // Pubkey, not AccountInfo
 let cpi_ctx = CpiContext::new(cpi_program, cpi_accounts);
 
-token::transfer(cpi_ctx, amount)?;
+transfer_checked(cpi_ctx, amount, ctx.accounts.mint.decimals)?;
 ```
 
 ### PDA-Signed CPI
@@ -243,8 +269,9 @@ let seeds = &[
 let signer_seeds = &[&seeds[..]];
 
 let cpi_ctx = CpiContext::new_with_signer(
-    ctx.accounts.token_program.to_account_info(),
-    Transfer {
+    ctx.accounts.token_program.key(),  // Pubkey in Anchor 1.0
+    TransferChecked {
+        mint: ctx.accounts.mint.to_account_info(),
         from: ctx.accounts.vault_token_account.to_account_info(),
         to: ctx.accounts.recipient_token_account.to_account_info(),
         authority: ctx.accounts.vault.to_account_info(),
@@ -252,7 +279,7 @@ let cpi_ctx = CpiContext::new_with_signer(
     signer_seeds,
 );
 
-token::transfer(cpi_ctx, amount)?;
+transfer_checked(cpi_ctx, amount, ctx.accounts.mint.decimals)?;
 ```
 
 ### Account Reloading After CPI (CRITICAL)
@@ -265,7 +292,7 @@ pub fn complex_operation(ctx: Context<ComplexOp>, amount: u64) -> Result<()> {
     msg!("Balance before: {}", ctx.accounts.token_account.amount);
 
     // Execute CPI that modifies the account
-    token::transfer(cpi_ctx, amount)?;
+    transfer_checked(cpi_ctx, amount, decimals)?;
 
     // WITHOUT RELOAD: balance still shows 100 (STALE DATA!)
     // WITH RELOAD: balance shows correct updated value
@@ -300,6 +327,8 @@ if cpi_program.key() != expected_program_id {
 ```
 
 ## Token Accounts
+
+Anchor 1.0: prefer `anchor_spl::token_interface` (the `InterfaceAccount` types below) so the same code works against both the classic Token Program and the Token Extensions Program. Pair it with `transfer_checked`.
 
 ### SPL Token
 ```rust
@@ -366,7 +395,7 @@ pub struct LargeAccount {
 ```
 Accounts under 10,240 bytes use `init`; larger require external creation then `zero` constraint.
 
-### LazyAccount (Anchor 0.31+)
+### LazyAccount (Anchor 1.0)
 ```rust
 // Cargo.toml: anchor-lang = { features = ["lazy-account"] }
 pub account: LazyAccount<'info, CustomAccountType>,
