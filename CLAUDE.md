@@ -66,7 +66,7 @@ When X changes, also update Y:
 | Add/remove **submodule** | .gitmodules, README.md submodules table + tree, QUICK-START.md tree, .claude/skills/SKILL.md routing |
 | Modify **install.sh** | Test: `bash tests/test_install.sh` in temp dir |
 | Modify **CLAUDE-solana.md** | This ships to ALL user projects — different audience than this repo |
-| Bump **`.claude/VERSION`** | Also bump `plugin/.claude-plugin/plugin.json` `version` (must match VERSION semver — `tests/test_plugin.sh` enforces) + `claude plugin tag` on release |
+| Bump **`.claude/VERSION`** | Also bump `plugin/.claude-plugin/plugin.json` `version` (must match VERSION semver — `tests/test_plugin.sh` enforces). The plugin is pinned by `plugin.json` `version` + the semver `vX.Y.Z` git tag; do NOT run `claude plugin tag` (it creates a redundant `{name}--vX.Y.Z` tag that duplicates the semver tag). |
 
 ## Submodule Pitfalls
 
