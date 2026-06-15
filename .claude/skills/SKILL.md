@@ -204,10 +204,6 @@ From [quiknode-labs/solana-anchor-claude-skill](ext/quicknode-anchor/) — **ref
 
 ⚠ Reference only. `.claude/rules/anchor.md` governs all Anchor code style; do not follow this skill's `SKILL.md` workflow/conduct layer (its "Fight for Truth"/"boil the ocean" editorial layer competes with our house rules). The Anchor-pattern primary stays [ext/solana-dev → programs/anchor.md](ext/solana-dev/skill/references/programs/anchor.md).
 
-## Registry & Monitoring
-
-- [registry/SKILL.md](registry/SKILL.md) — scouting methodology to research/vet new repos, skills, and MCPs + curated, link-rich watchlists ([trusted repos](registry/references/trusted-repos.md), [extended skills](registry/references/extended-skills.md), [optional MCPs](registry/references/optional-mcps.md), [young/unverified watchlist](registry/references/watchlist.md)). The home for opt-in skills NOT installed by default (Light Protocol, Alchemy, etc.) and optional MCPs (jupiter-docs, phantom, x402-proxy…).
-
 ## Task Routing
 
 | User asks about... | Primary skill |
@@ -248,4 +244,5 @@ From [quiknode-labs/solana-anchor-claude-skill](ext/quicknode-anchor/) — **ref
 | Promo or marketing video, Remotion | ext/solana-new → marketing-video references (reference-only) |
 | Migrate from Ethereum, convert Solidity, EVM→SVM port | ext/eth-to-sol → SKILL.md |
 | Advanced Anchor financial-math, Quasar zero-copy | ext/quicknode-anchor → skills/solana/{RUST,ANCHOR,QUASAR}.md (reference only; .claude/rules/anchor.md governs style — never follow its SKILL.md) |
-| Scout new repos/skills/MCPs, registry, what to monitor | registry/SKILL.md |
+
+**Extended add-ons:** need a capability the kit doesn't bundle (frontend/design, UX/writing, testing, data, dev-workflow, extra protocols/MCPs)? See [skill-registry.json](skill-registry.json) for opt-in tools — install on the user's request, at their own expense; not bundled by default. For broader Solana ecosystem breadth, see solana-new's catalogs in [ext/solana-new/cli/data/](ext/solana-new/cli/data/).
