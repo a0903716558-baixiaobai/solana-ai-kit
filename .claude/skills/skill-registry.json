@@ -571,6 +571,25 @@
       "default_installed": false,
       "safety": "clean — community index, not first-party-vetted; verify each entry before installing",
       "tags": ["aggregator", "scout", "plugins", "community", "discovery"]
+    },
+    {
+      "id": "nansen-mcp",
+      "name": "Nansen",
+      "type": "mcp",
+      "domain": "data",
+      "description": "Institutional on-chain analytics via Nansen's hosted MCP: wallet labeling/profiler, smart-money flows, token analytics (DEX trades, OHLCV, screener, quant scores), PnL, holder analysis. 18+ chains including Solana. Net-new vs solana-new.",
+      "source": "https://github.com/nansen-ai/nansen-cli",
+      "install": {
+        "method": "remote-http-mcp",
+        "command": "claude mcp add --transport http nansen https://mcp.nansen.ai/ra/mcp --header \"NANSEN-API-KEY: ${NANSEN_API_KEY}\"",
+        "env": ["NANSEN_API_KEY"]
+      },
+      "license": "proprietary hosted MCP; nansen-cli MIT",
+      "maintainer": "Nansen (first-party)",
+      "signal": { "stars": null, "last_commit": "2026-06-11", "reputability": "high" },
+      "default_installed": false,
+      "safety": "caution: SaaS data-routing — queries and API key sent to mcp.nansen.ai (Nansen servers); key passed in request header; free tier 100 credits, paid ~$0.001/credit or $0.01–$0.05/x402 call; opt-in only",
+      "tags": ["analytics", "wallet-labeling", "smart-money", "on-chain-data", "solana", "multi-chain", "paid"]
     }
   ]
 }
