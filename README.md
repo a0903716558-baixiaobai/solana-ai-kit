@@ -1,3 +1,5 @@
+<p align="center"><img src=".github/assets/solana-ai-kit-banner.png" alt="Solana AI Kit — Skill, MCP & config aggregator for Claude Code, Codex + any agentic setup" width="100%" /></p>
+
 # Solana AI Kit
 
 [![CI](https://github.com/solanabr/solana-ai-kit/actions/workflows/ci.yml/badge.svg)](https://github.com/solanabr/solana-ai-kit/actions/workflows/ci.yml)
@@ -190,6 +192,25 @@ Pre-configured MCP servers in `.mcp.json` (API keys go in `.env`):
 | DeFi | Jupiter, Drift, Kamino, Raydium, Orca, Meteora |
 | Infrastructure | Cloudflare Workers, GitHub Actions, Docker |
 
+## Extended Skills & Add-on Registry
+
+Beyond the bundled submodules above, the kit ships a curated catalog of **opt-in** skills, plugins, and MCPs that are **not installed by default** — the agent installs them only on your request, at your own expense. The set is deduped against [solana-new's](https://github.com/sendaifun/solana-new) vendored ecosystem catalogs so it surfaces net-new, high-signal picks rather than restating what's already reachable.
+
+Featured add-ons by domain:
+
+- **Claude-official:** [anthropics/skills](https://github.com/anthropics/skills) · [anthropics/claude-code](https://github.com/anthropics/claude-code) plugins (non-OSI license; overlaps `/diff-review` + `cso`)
+- **Dev-workflow:** [wshobson/agents](https://github.com/wshobson/agents) · [gsd-build/get-shit-done](https://github.com/gsd-build/get-shit-done)
+- **Frontend/Design:** [zarazhangrui/frontend-slides](https://github.com/zarazhangrui/frontend-slides) · [uxKero/anydesign](https://github.com/uxKero/anydesign) · [dylantarre/animation-principles](https://github.com/dylantarre/animation-principles)
+- **UX/Writing:** [content-designer/ux-writing-skill](https://github.com/content-designer/ux-writing-skill) · [cuellarfr/design-skills](https://github.com/cuellarfr/design-skills)
+- **Testing:** [SawyerHood/dev-browser](https://github.com/SawyerHood/dev-browser) · [conorluddy/ios-simulator-skill](https://github.com/conorluddy/ios-simulator-skill)
+- **Data:** [K-Dense-AI/scientific-agent-skills](https://github.com/K-Dense-AI/scientific-agent-skills) · [Nansen](https://github.com/nansen-ai/nansen-cli) (paid analytics MCP)
+
+**Where we scout** new tools (aggregators, not installable): [ComposioHQ/awesome-claude-skills](https://github.com/ComposioHQ/awesome-claude-skills) · [travisvn/awesome-claude-skills](https://github.com/travisvn/awesome-claude-skills) · [davepoon/buildwithclaude](https://github.com/davepoon/buildwithclaude) · [hesreallyhim/awesome-claude-code](https://github.com/hesreallyhim/awesome-claude-code) · [VoltAgent/awesome-claude-code-subagents](https://github.com/VoltAgent/awesome-claude-code-subagents).
+
+For broader Solana coverage, see solana-new's vendored catalogs at `ext/solana-new/cli/data/` (MCPs, skills, clonable repos).
+
+See [`skill-registry.json`](.claude/skills/skill-registry.json) for the complete extended catalog — every entry with its install command, license, and safety caveats.
+
 ## Repository Structure
 
 ```
@@ -378,52 +399,6 @@ bash .claude/bin/resync.sh
 # Or manually update submodules
 git submodule update --remote --merge
 ```
-
-## Credits
-
-This project builds on excellent work from the community:
-
-- **[solana-foundation/solana-dev-skill](https://github.com/solana-foundation/solana-dev-skill)** - The Solana Foundation's comprehensive skill set for Solana development, included as the primary submodule.
-
-- **[sendaifun/skills](https://github.com/sendaifun/skills)** - SendAI's protocol-specific skills for DeFi integrations.
-
-- **[solanabr/solana-game-skill](https://github.com/solanabr/solana-game-skill)** - Game development skills for Unity and PlaySolana.
-
-- **[trailofbits/skills](https://github.com/trailofbits/skills)** - Trail of Bits security auditing skills.
-
-- **[cloudflare/skills](https://github.com/cloudflare/skills)** - Cloudflare infrastructure skills.
-
-- **[QEDGen/solana-skills](https://github.com/QEDGen/solana-skills)** - Formal verification for Solana programs using Lean 4 theorem proving.
-
-- **[ColosseumOrg/colosseum-copilot](https://github.com/ColosseumOrg/colosseum-copilot)** - Solana startup research, idea validation, and hackathon project discovery from Colosseum. Proprietary license (Copyright Colosseum).
-
-- **[0xquinto/bcherny-claude](https://github.com/0xquinto/bcherny-claude)** - Compiled Boris Cherny's (creator of Claude Code at Anthropic) best practices including verification loops, parallel Claude sessions, and CLAUDE.md patterns.
-
-- **[sendaifun/solana-new](https://github.com/sendaifun/solana-new)** - SendAI + Superteam's idea→launch journey skills, idea datasets, and ecosystem catalogs (basis of the `idea-sprint`, `pitch-deck`, and `hackathon` wrapper skills). The bundled idea datasets draw on primary sources from Superteam, Y Combinator, a16z crypto, and Alliance. MIT licensed:
-
-  > MIT License
-  >
-  > Copyright (c) 2026 SendAI and Superteam
-  >
-  > Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
-  >
-  > The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
-  >
-  > THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
-
-- **cso** by **gstack** - The infrastructure-first security audit methodology shipped in sendaifun/solana-new, the basis of our `/audit-infra` command (adapted telemetry-free).
-
-- **[ghostsecurity/skills](https://github.com/ghostsecurity/skills)** and **[anthropics/defending-code-reference-harness](https://github.com/anthropics/defending-code-reference-harness)** - AppSec scanning skills and Anthropic's vulnerability-discovery reference harness, both included as submodules under their Apache-2.0 licenses.
-
-- **[jup-ag/agent-skills](https://github.com/jup-ag/agent-skills)** - Jupiter's official agent skills (Ultra swap, Lend, swap migration, VRFD), included as a submodule under the MIT license.
-
-- **[metaplex-foundation/skill](https://github.com/metaplex-foundation/skill)** - Metaplex's official NFT-standards skill (Core, Token Metadata, Bubblegum, Candy Machine, Genesis), included as a submodule under the Apache-2.0 license.
-
-- **[helius-labs/core-ai](https://github.com/helius-labs/core-ai)** - Helius's official infrastructure skill plus its SVM-internals skill, included as a submodule under the MIT license. Home repo of the Helius MCP server shipped in this kit.
-
-- **[quiknode-labs/solana-anchor-claude-skill](https://github.com/quiknode-labs/solana-anchor-claude-skill)** - QuickNode's Anchor / financial-math / Quasar reference material, included as a submodule under the MIT license (quarantined — reference files only; `.claude/rules/anchor.md` governs code style).
-
-- **[solana-foundation/eth-to-sol-skill](https://github.com/solana-foundation/eth-to-sol-skill)** - The Solana Foundation's EVM/Solidity → Anchor two-pass porting skill, included as a submodule.
 
 ## License
 

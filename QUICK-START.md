@@ -134,6 +134,8 @@ Knowledge loads on-demand:
 - PlaySolana/PSG1 integration
 - Security auditing
 
+Need a capability the kit doesn't bundle? See [`.claude/skills/skill-registry.json`](.claude/skills/skill-registry.json) — a curated catalog of opt-in skills/MCPs/repos the agent can install on request, at your own expense (not bundled by default).
+
 ---
 
 ## Supported Tech Stack
